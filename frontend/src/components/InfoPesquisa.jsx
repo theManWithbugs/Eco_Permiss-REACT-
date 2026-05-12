@@ -21,7 +21,7 @@ function InfoPesquisa() {
   const area_atuacao = obj.area_atuacao || [];
 
   return (
-    <div className='container-fluid' style={{ marginTop: '150px' }}>
+    <div className='container-fluid'>
       <div className='card relatorio-card'>
         <div className="relatorio-header">
           <div className="row align-items-center">

@@ -127,7 +127,7 @@ function SolicPesquisa() {
 
   return (
     <div className='container'>
-      <div className='bg-white p-4 rounded shadow-sm' style={{ marginTop: '150px' }}>
+      <div className='bg-white p-4 rounded shadow-sm'>
         <form onSubmit={handleSubmit}>
 
           <div className='row'>

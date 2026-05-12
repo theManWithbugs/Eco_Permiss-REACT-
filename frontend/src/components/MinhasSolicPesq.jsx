@@ -40,7 +40,7 @@ function MinhasSolicPesq() {
 
   return (
 
-      <div className='container bg-white p-2 rounded' style={{ marginTop: '150px' }}>
+      <div className='container bg-white p-2 rounded'>
         <h5 className='pesquisas_title'>Pesquisas | (Solicitadas/Finalizadas)</h5>
         <div id="container_error" className="error-container"></div>
 
@@ -59,7 +59,6 @@ function MinhasSolicPesq() {
           <button>Proxima</button>
           <button>Anterior</button>
         </div>
-
       </div>
 
   );
