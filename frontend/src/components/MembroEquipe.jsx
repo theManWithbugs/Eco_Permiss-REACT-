@@ -64,7 +64,7 @@ function RenderFormset() {
     };
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/receber_dados/", {
+      const response = await fetch("http://127.0.0.1:8000/api/membros_solic_pesq/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

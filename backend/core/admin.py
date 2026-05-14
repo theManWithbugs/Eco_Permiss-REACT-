@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+#Local imports
+from . models import Ugai
+
+admin.site.register(Ugai)

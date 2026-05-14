@@ -2,8 +2,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import "../styles/minhas_solic.css";
-import "../constants/choices";
-import buscarChoicesDoBanco from '../constants/choices';
+import buscarChoicesDoBanco from '../constants/choices'; // Importação corrigida e única
 
 function SolicPesquisa() {
   const navigate = useNavigate();
@@ -20,17 +19,8 @@ function SolicPesquisa() {
   const [unidade, setUnidade] = useState([]);
   const [areaAtuacao, setAreaAtuacao] = useState([]);
 
-  const ucsChoices = [
-    { value: "parque_estadual_chandless", label: "Parque Estadual Chandless" },
-    { value: "apa_lago_do_amapa", label: "APA Lago do Amapá" },
-    { value: "apa_igarape_sao_francisco", label: "APA Igarapé São Francisco" },
-    { value: "floresta_estadual_antimary", label: "Floresta Estadual do Antimary" },
-    { value: "floresta_estadual_rio_gregorio", label: "Floresta Estadual do Rio Gregório" },
-    { value: "floresta_estadual_mogno", label: "Floresta Estadual do Mogno" },
-    { value: "floresta_estadual_liberdade", label: "Floresta Estadual Liberdade" },
-    { value: "floresta_estadual_afluente", label: "Floresta Estadual Afluente" },
-    { value: "arie_japiim_pentecoste", label: "ARIE Japiim Pentecoste" }
-  ];
+  // 1. Estado criado para armazenar as opções vindas da API/Banco
+  const [novasUnidadesDoBanco, setNovasUnidadesDoBanco] = useState([]);
 
   const areaAtuacaoChoices = [
     { value: "FAUNA", label: "Fauna" },
@@ -68,7 +58,7 @@ function SolicPesquisa() {
     const token = localStorage.getItem("access");
 
     if (!token) {
-      alert("⚠️ Você precisa estar logado");
+      navigate('/login');
       return;
     }
 
@@ -88,7 +78,7 @@ function SolicPesquisa() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // 🔥 ESSENCIAL
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(payload),
       });
@@ -121,12 +111,30 @@ function SolicPesquisa() {
     }
   };
 
+  // 2. Busca e insere os dados dinamicamente no estado ao carregar a tela
   useEffect(() => {
-    buscarChoicesDoBanco();
+    const carregar_unidades = async () => {
+      try {
+        const choicesUcs = await buscarChoicesDoBanco();
+
+        const formatadoParaReact = choicesUcs.map(([chave, nome]) => ({
+          value: chave,
+          label: nome
+        }));
+
+        // Salva a lista processada no estado reativo
+        setNovasUnidadesDoBanco(formatadoParaReact);
+
+      } catch (erro) {
+        console.error("Erro ao buscar dados:", erro);
+      }
+    };
+    carregar_unidades();
   }, []);
 
+
   return (
-    <div className='container'>
+    <div className='container mt-4'>
       <div className='bg-white p-4 rounded shadow-sm'>
         <form onSubmit={handleSubmit}>
 
@@ -181,7 +189,8 @@ function SolicPesquisa() {
             <div className='col-md-6'>
               <label className='fw-bold'>Unidades:</label>
               <div className='border p-2 rounded' style={{ maxHeight: '150px', overflowY: 'auto' }}>
-                {ucsChoices.map((uc) => (
+                {/* 3. Renderização dinâmica mapeada a partir do estado */}
+                {novasUnidadesDoBanco.map((uc) => (
                   <div key={uc.value} className="form-check">
                     <input
                       className="form-check-input"
@@ -227,7 +236,7 @@ function SolicPesquisa() {
               <label className='fw-bold'>Data início</label>
               <input
                 type="date"
-                className='form-control'
+                className="form-control"
                 value={dataInic}
                 onChange={(e) => setDataInic(e.target.value)}
               />
@@ -237,17 +246,14 @@ function SolicPesquisa() {
               <label className='fw-bold'>Data fim</label>
               <input
                 type="date"
-                className='form-control'
+                className="form-control"
                 value={dataFim}
                 onChange={(e) => setDataFim(e.target.value)}
               />
             </div>
           </div>
 
-          <button type="submit" className="btn btn-primary mt-3">
-            Enviar Solicitação
-          </button>
-
+          <button type="submit" className="btn btn-primary mt-4">Enviar</button>
         </form>
       </div>
     </div>

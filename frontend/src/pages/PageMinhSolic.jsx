@@ -5,24 +5,41 @@ import NavUser from "../components/NavUser";
 import MinhasSolicPesq from "../components/MinhasSolicPesq";
 import { useState } from 'react';
 import MinhasSolicUgai from '../components/MinhasSolicUgai';
+import "../styles/btn_secondary.css"
 
 function MinhasSolic() {
   const [component, setComponent] = useState("pesquisa");
 
-  function switchComponent(component) {
-    setComponent(component);
+  function switchComponent(targetComponent) {
+    setComponent(targetComponent);
   }
 
   return (
     <>
       <NavUser />
 
-      <div className='container bg-white mb-2 rounded p-2 gap-2'>
-        <button onClick={() => switchComponent("pesquisa")}
-        className='me-2 btn btn-secondary'>Pesquisa</button>
+      <div className="link-menu-container container">
+        <nav className="link-menu">
+          <a
+            // #Aplicando lógica diretamnete na classe
+            className={`menu-btn menu-btn-pesquisa ${component === "pesquisa" ? "active" : ""}`}
+            data-page="pesquisa"
+            onClick={() => switchComponent("pesquisa")}>
+            <span className="btn-icon">📋</span>
+            <span className="btn-text">PESQUISAS</span>
+            <span className="btn-indicator"></span>
+          </a>
 
-        <button onClick={() => setComponent("ugai")}
-        className='btn btn-secondary'>Ugai</button>
+          <a
+            className={`menu-btn menu-btn-ugai ${component === "ugai" ? "active" : ""}`}
+            data-page="ugai"
+            onClick={() => switchComponent("ugai")}
+          >
+            <span className="btn-icon">🏠</span>
+            <span className="btn-text">UGAI</span>
+            <span className="btn-indicator"></span>
+          </a>
+        </nav>
       </div>
 
       {component === "pesquisa" && <MinhasSolicPesq />}

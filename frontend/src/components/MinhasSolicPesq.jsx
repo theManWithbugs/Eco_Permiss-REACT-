@@ -11,7 +11,7 @@ function MinhasSolicPesq() {
     const token = localStorage.getItem("access");
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/minhas_solic/", {
+      const response = await fetch("http://127.0.0.1:8000/api/minhas_solic_pesq/", {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`
@@ -47,8 +47,8 @@ function MinhasSolicPesq() {
         <br />
 
           {dados.map((item) => (
-            <div className='card_items' key={item.id}>
-              <h5 className='text-uppercase'>{item.acao_realizada}</h5>
+            <div className='card_items' key={ item.id }>
+              <h5 className='text-uppercase'>{ item.acao_realizada }</h5>
               <a style={{ cursor: 'pointer', color: 'white' }} onClick={() => infoPesquisa(item)}>
                 Ver detalhes</a>
               <p>ID atual: { item.id }</p>

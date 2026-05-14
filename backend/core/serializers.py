@@ -1,16 +1,10 @@
 from rest_framework import serializers
-from .models import TabelaTeste, DadosSolicPesquisa, MembroEquipe
-
-
-class TesteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TabelaTeste
-        fields = '__all__'
+from .models import DadosSolicPesquisa, MembroEquipe, SolicitacaoUgais
 
 class SerializerGetDataPesq(serializers.ModelSerializer):
     class Meta:
         model = DadosSolicPesquisa
-        fields = '__all__'
+        fields = "__all__"
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -22,6 +16,11 @@ class SerializerGetDataPesq(serializers.ModelSerializer):
             data['area_atuacao'] = data['area_atuacao'].split(",")
 
         return data
+
+class SerializerGetDataUgai(serializers.ModelSerializer):
+    class Meta:
+        model = SolicitacaoUgais
+        fields = "__all__"
 
 class SerializerSolicPesq(serializers.ModelSerializer):
 
@@ -37,8 +36,6 @@ class SerializerSolicPesq(serializers.ModelSerializer):
 
     # 🔥 VALIDAÇÕES
     def validate(self, data):
-        print("\n==== VALIDANDO DADOS ====")
-        print(data)
 
         if data['inicio_atividade'] > data['final_atividade']:
             raise serializers.ValidationError({
@@ -49,9 +46,6 @@ class SerializerSolicPesq(serializers.ModelSerializer):
 
     # 🔥 CREATE CUSTOM (DEBUG TOTAL)
     def create(self, validated_data):
-        print("\n==== CREATE ====")
-        print(validated_data)
-
         return super().create(validated_data)
 
 class SerializerMembroEquipe(serializers.ModelSerializer):
