@@ -21,3 +21,7 @@ backend/staticfiles
 
 # Sistema
 .DS_Store
+
+.venv
+venv/
+
