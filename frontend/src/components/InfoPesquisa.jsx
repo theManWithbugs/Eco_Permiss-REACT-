@@ -1,5 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import '../styles/info_pesquisa.css';
 
@@ -8,6 +8,7 @@ function InfoPesquisa() {
   const location = useLocation();
   const obj = location.state;
 
+  const [membros, setMembros] = useState([]);
   useEffect(() => {
     if (!obj) {
       navigate('/minhas_solic');
@@ -19,6 +20,45 @@ function InfoPesquisa() {
   const ucs_ = obj.unidade_cons || [];
   // Ajustado para area_atuacao para bater com o nome usado no map abaixo
   const area_atuacao = obj.area_atuacao || [];
+
+  const payload = {
+    id: obj.id
+  }
+
+  const buscarMembros = async () => {
+    const token = localStorage.getItem("access");
+    if (!token) {
+      alert("⚠️ Você precisa estar logado");
+      navigate('/login');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/membros_equip/', {
+        method: "POST",
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao buscar dados");
+      }
+
+      const data = await response.json();
+      setMembros(data);
+
+    } catch (error) {
+      console.error("Erro ao buscar membros:", error);
+      alert("Houve um erro ao processar sua requisição.");
+    }
+  }
+
+  useEffect(() => {
+    buscarMembros();
+  }, []);
 
   return (
     <div className='container-fluid'>
@@ -110,6 +150,22 @@ function InfoPesquisa() {
                     <div key={index}>{area}</div>
                   ))}
                 </div>
+              </div>
+            </div>
+          </div>
+            <hr />
+          <div className='secao'>
+            <h5>
+              {/* <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-flower1 me-2" viewBox="0 0 16 16">
+                <path d="M6.174 1.184a.5.5 0 0 1 .652.78L6.1 2.393a3 3 0 1 1 4.788 3.894L9.5 6.393v1.214a3 3 0 1 1-3.894 4.788l-.68-.734a.5.5 0 1 1 .78-.652l.68.734a2 2 0 1 0 2.612-2.612l-1.06-1.06a2 2 0 1 0-3.894 0l1.06 1.06a2 2 0 1 0 2.612 2.612l.68-.734a.5.5 0 1 1 .78.652l-.68.734a3 3 0 1 1-4.788-3.894l1.214-.536H6.5a3 3 0 1 1-3.894-4.788l.734.68a.5.5 0 1 1-.652-.78l-.734-.68A3 3 0 1 1 6.174 1.184Z"/>
+              </svg> */}
+              Membros da equipe de pesquisa
+            </h5>
+            <div className='row g-4'>
+              <div className='col-md-12'>
+                {membros.map((membro, index) => (
+                  <p key={index}>{membro.nome}</p>
+                ))}
               </div>
             </div>
           </div>

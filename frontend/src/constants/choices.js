@@ -21,7 +21,7 @@ export const buscarChoicesDoBanco = () => {
   })
   .then(data => {
     // Agora sim conseguimos ver os dados e usá-los
-    console.log("Dados recebidos do banco:", data);
+    // console.log("Dados recebidos do banco:",data);
     return data;
   })
   .catch(error => {

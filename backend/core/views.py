@@ -4,7 +4,7 @@ from .serializers import *
 from .models import DadosSolicPesquisa, Ugai, SolicitacaoUgais
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
-from .choices import *
+from .choices import UCS_CHOICES, CHOICES_AREA_ATUACAO
 
 #GET
 #This needs atention!
@@ -39,17 +39,38 @@ def minhas_solic_ugai(request):
         return Response(f"Ocorreu um erro: {e}", status=500)
 
 @api_view(['GET'])
-def get_backend_choices(request):
+def get_choices(request):
 
     ucs = UCS_CHOICES
+    areas_atuacao = CHOICES_AREA_ATUACAO
 
-    return Response(data=ucs, status=200)
+    dados = {
+        "choices_ucs": ucs,
+        "choices_area": areas_atuacao
+    }
+
+    return Response(data=dados, status=200)
 
 #POST
 #-----------------------------------------------------------------#
 #-----------------------------------------------------------------#
-
 # 🔥 PRINCIPAL
+
+@api_view(['POST'])
+def membros_pesq(request):
+    class SerializerMembrosPesq(serializers.ModelSerializer):
+        class Meta:
+            model = MembroEquipe
+            fields = '__all__'
+
+    id = request.data.get('id')
+    try:
+        membros = MembroEquipe.objects.filter(pesquisa=id)
+        serializer = SerializerMembrosPesq(membros, many=True)
+        return Response(serializer.data, status=200)
+    except Exception as e:
+        return Response(f"Ocorreu um erro: {e}", status=500)
+
 #Salva o obj pai da solicitação de pesquisa
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

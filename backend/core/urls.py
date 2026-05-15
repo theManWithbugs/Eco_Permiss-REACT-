@@ -5,9 +5,10 @@ from .views import (
     minhas_solic_ugai,
     solic_pesquisa,
     membros_solic_pesq,
-    get_backend_choices,
+    get_choices,
     only_to_see,
-    solic_ugai
+    solic_ugai,
+    membros_pesq
 )
 
 urlpatterns = [
@@ -19,11 +20,13 @@ urlpatterns = [
     # Solicitação de Pesquisa
     path('api/minhas_solic_pesq/', minhas_solic_pesq),
 
+    path('api/membros_equip/', membros_pesq),
+
     # Solicitação de UGAI
     path('api/minhas_solic_ugai/', minhas_solic_ugai),
 
     # Get backend choices
-    path('api/get_choices/', get_backend_choices),
+    path('api/get_choices/', get_choices),
 
     # 🔥 PRINCIPAL
     # Solicitação de pesquisa

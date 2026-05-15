@@ -20,21 +20,8 @@ function SolicPesquisa() {
   const [areaAtuacao, setAreaAtuacao] = useState([]);
 
   // 1. Estado criado para armazenar as opções vindas da API/Banco
-  const [novasUnidadesDoBanco, setNovasUnidadesDoBanco] = useState([]);
-
-  const areaAtuacaoChoices = [
-    { value: "FAUNA", label: "Fauna" },
-    { value: "FLORA", label: "Flora" },
-    { value: "ECOLOGIA", label: "Ecologia" },
-    { value: "GEOLOGIA", label: "Geologia" },
-    { value: "SOCIOECONOMIA", label: "Socioeconomia" },
-    { value: "ARQUEOLOGIA", label: "Arqueologia" },
-    { value: "TURISMO", label: "Turismo" },
-    { value: "RECURSOS HIDRICOS", label: "Recursos hidricos" },
-    { value: "EDUCAÇÃO AMBIENTAL", label: "Educação Ambiental" },
-    { value: "CAVIDADES NATURAIS", label: "Cavidades Naturais" },
-    { value: "OUTROS", label: "Outros" }
-  ];
+  const [choicesUCS, setChoicesUCS] = useState([]);
+  const [choicesArea, setChoicesArea] = useState([]);
 
   const handleCheckboxChangeUnidade = (value) => {
     setUnidade((prev) =>
@@ -115,15 +102,21 @@ function SolicPesquisa() {
   useEffect(() => {
     const carregar_unidades = async () => {
       try {
-        const choicesUcs = await buscarChoicesDoBanco();
+        const choices = await buscarChoicesDoBanco();
 
-        const formatadoParaReact = choicesUcs.map(([chave, nome]) => ({
+        const choicesUCS_ = choices["choices_ucs"].map(([chave, nome]) => ({
+          value: chave,
+          label: nome
+        }));
+
+        const choicesArea_ = choices["choices_area"].map(([chave, nome]) => ({
           value: chave,
           label: nome
         }));
 
         // Salva a lista processada no estado reativo
-        setNovasUnidadesDoBanco(formatadoParaReact);
+        setChoicesUCS(choicesUCS_);
+        setChoicesArea(choicesArea_);
 
       } catch (erro) {
         console.error("Erro ao buscar dados:", erro);
@@ -170,7 +163,7 @@ function SolicPesquisa() {
             <div className='col-md-6'>
               <label className='fw-bold'>Área de atuação:</label>
               <div className='border p-2 rounded' style={{ maxHeight: '150px', overflowY: 'auto' }}>
-                {areaAtuacaoChoices.map((area) => (
+                {choicesArea.map((area) => (
                   <div key={area.value} className="form-check">
                     <input
                       className="form-check-input"
@@ -190,7 +183,7 @@ function SolicPesquisa() {
               <label className='fw-bold'>Unidades:</label>
               <div className='border p-2 rounded' style={{ maxHeight: '150px', overflowY: 'auto' }}>
                 {/* 3. Renderização dinâmica mapeada a partir do estado */}
-                {novasUnidadesDoBanco.map((uc) => (
+                {choicesUCS.map((uc) => (
                   <div key={uc.value} className="form-check">
                     <input
                       className="form-check-input"

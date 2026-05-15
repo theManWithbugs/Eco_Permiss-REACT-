@@ -102,7 +102,7 @@ function RenderFormset() {
     <>
       <NavUser />
 
-      <div className='container' style={{ marginTop: '10rem' }}>
+      <div className='container'>
         {formsets.map((form, index) => (
           <div key={form.id} className='card p-3 mb-3 border'>
             <h5 className='mb-3'>Membro #{index + 1}</h5>
