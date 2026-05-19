@@ -8,7 +8,9 @@ from .views import (
     get_choices,
     only_to_see,
     solic_ugai,
-    membros_pesq
+    membros_pesq,
+    FileUploadView,
+    get_url_doc
 )
 
 urlpatterns = [
@@ -27,6 +29,8 @@ urlpatterns = [
 
     # Get backend choices
     path('api/get_choices/', get_choices),
+    path('api/get_doc/', get_url_doc),
+
 
     # 🔥 PRINCIPAL
     # Solicitação de pesquisa
@@ -35,5 +39,7 @@ urlpatterns = [
 
     # path('api/solic_ugai/', )
     path('api/see_ugai/', only_to_see),
-    path('api/solic_ugai/', solic_ugai)
+    path('api/solic_ugai/', solic_ugai),
+
+    path('api/file_upload/', FileUploadView.as_view())
 ]

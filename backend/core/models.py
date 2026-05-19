@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db.models import Sum
 import uuid
+import os
 
 #Local imports
 from .choices import YES_OR_NOT, CHOICES_STATUS, IDENTIDADE_GENERO_CHOICES, RACA_CHOICES
@@ -193,3 +194,25 @@ class MembroEquipeUGAI(models.Model):
         indexes = [
             models.Index(fields=["solicitacao_ref"]),
         ]
+
+def get_upload_path(instance, filename):
+    ano = timezone.now().year
+    area_atuacao = instance.pesquisa.area_atuacao
+
+    return os.path.join('rel_final_pesq', str(ano), str(area_atuacao), filename)
+
+class ArquivosRelFinal(models.Model):
+    pesquisa = models.ForeignKey(
+        DadosSolicPesquisa, on_delete=models.CASCADE, related_name='arq_pesquisa')
+    documento = models.FileField(upload_to=get_upload_path)
+    upado_em = models.DateTimeField(default=timezone.now)
+
+    def delete_documento(self):
+        if self.documento:
+            if os.path.isfile(self.documento.path):
+                os.remove(self.documento.path)
+            self.documento = None
+        self.delete()
+
+    def __str__(self):
+        return f"{self.pesquisa.acao_realizada}"

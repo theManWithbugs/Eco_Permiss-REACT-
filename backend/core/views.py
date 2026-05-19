@@ -1,10 +1,14 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from .serializers import *
-from .models import DadosSolicPesquisa, Ugai, SolicitacaoUgais
+from .models import DadosSolicPesquisa, Ugai, SolicitacaoUgais, ArquivosRelFinal
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from .choices import UCS_CHOICES, CHOICES_AREA_ATUACAO
+
+from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework import status
 
 #GET
 #This needs atention!
@@ -142,6 +146,29 @@ def only_to_see(request):
 
     return Response(serializer.data, status=200)
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def get_url_doc(request):
+
+    class SerializerDoc(serializers.ModelSerializer):
+        class Meta:
+            model = ArquivosRelFinal
+            fields = "__all__"
+
+    id_pesquisa = request.data.get('id_pesq')
+    pesquisa = get_object_or_404(DadosSolicPesquisa, id=id_pesquisa)
+
+    if not id_pesquisa:
+        return Response("Pesquisa referente não localizada!", status=404)
+
+    try:
+        objs = ArquivosRelFinal.objects.filter(pesquisa=pesquisa)
+        serializer = SerializerDoc(objs, many=True, context={'request': request})
+        return Response(serializer.data, status=200)
+    except Exception as e:
+        return Response(f"Ocorreu um erro: {e}", status=500)
+
+
 # Criar solicitação de UGAI
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -167,3 +194,32 @@ def solic_ugai(request):
         return Response(serializer.data, status=200)
 
     return Response(serializer.errors, status=400)
+
+class FileUploadView(APIView):
+    # Avisa ao Django REST que esta rota processa arquivos e formulários
+    parser_classes = (MultiPartParser, FormParser)
+
+    def post(self, request, *args, **kwargs):
+        # Captura o arquivo enviado pelo React pelo nome da chave do append ('documento')
+        arquivo_recebido = request.FILES.get('documento')
+        pesquisa_id = request.data.get('pesquisa_id')
+        pesquisa = get_object_or_404(DadosSolicPesquisa, id=pesquisa_id)
+
+        if not arquivo_recebido:
+            return Response("Nenhum arquivo enviado", status=400)
+
+        if arquivo_recebido:
+            arq_nome = arquivo_recebido.name
+            doc_type = arq_nome.split('.')[-1]
+
+            if doc_type != 'pdf':
+                return Response(f"Apenas formato pdf aceito!", status=500)
+            else:
+                try:
+                    ArquivosRelFinal.objects.create(
+                        pesquisa=pesquisa,
+                        documento=arquivo_recebido
+                    )
+                    return Response("Arquivo Salvo com sucesso!", status=201)
+                except Exception as e:
+                    return Response(f"Ocorreu um erro: {e}", status=500)

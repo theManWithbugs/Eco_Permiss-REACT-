@@ -87,6 +87,12 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # ========================
+# 🔥 MEDIA (ARQUIVOS DE UPLOAD)
+# ========================
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# ========================
 # INTERNACIONALIZAÇÃO
 # ========================
 LANGUAGE_CODE = 'pt-br'
