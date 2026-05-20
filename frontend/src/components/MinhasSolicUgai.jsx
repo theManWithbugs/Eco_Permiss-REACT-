@@ -1,6 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import API_URL from "../constants/global.js";
 
 function MinhasSolicUgai() {
   const navigate = useNavigate();
@@ -10,7 +11,7 @@ function MinhasSolicUgai() {
     const token = localStorage.getItem("access");
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/minhas_solic_ugai/", {
+      const response = await fetch(`${API_URL}/api/minhas_solic_ugai/`, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`

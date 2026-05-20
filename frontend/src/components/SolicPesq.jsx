@@ -1,13 +1,14 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import "../styles/minhas_solic.css";
-import buscarChoicesDoBanco from '../constants/choices'; // Importação corrigida e única
+import buscarChoicesDoBanco from '../constants/choices';
+import API_URL from "../constants/global.js";
+import '../styles/solic_pesq.css';
 
 function SolicPesquisa() {
   const navigate = useNavigate();
 
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const [acao, setAcao] = useState('');
   const [foto, setFoto] = useState('');
@@ -19,7 +20,6 @@ function SolicPesquisa() {
   const [unidade, setUnidade] = useState([]);
   const [areaAtuacao, setAreaAtuacao] = useState([]);
 
-  // 1. Estado criado para armazenar as opções vindas da API/Banco
   const [choicesUCS, setChoicesUCS] = useState([]);
   const [choicesArea, setChoicesArea] = useState([]);
 
@@ -41,6 +41,7 @@ function SolicPesquisa() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     const token = localStorage.getItem("access");
 
@@ -61,7 +62,7 @@ function SolicPesquisa() {
     };
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/solic_pesquisa/', {
+      const response = await fetch(`${API_URL}/api/solic_pesquisa/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -78,6 +79,7 @@ function SolicPesquisa() {
 
       if (!response.ok) {
         setErrors(data);
+        setLoading(false);
         return;
       }
 
@@ -91,14 +93,15 @@ function SolicPesquisa() {
       setDataFim('');
       setRetCom('');
       setAreaAtuacao([]);
+      setLoading(false);
 
     } catch (error) {
       console.error("❌ ERRO:", error);
       alert("Erro ao conectar com o servidor");
+      setLoading(false);
     }
   };
 
-  // 2. Busca e insere os dados dinamicamente no estado ao carregar a tela
   useEffect(() => {
     const carregar_unidades = async () => {
       try {
@@ -114,7 +117,6 @@ function SolicPesquisa() {
           label: nome
         }));
 
-        // Salva a lista processada no estado reativo
         setChoicesUCS(choicesUCS_);
         setChoicesArea(choicesArea_);
 
@@ -125,128 +127,168 @@ function SolicPesquisa() {
     carregar_unidades();
   }, []);
 
-
   return (
-    <div className='container mt-4'>
-      <div className='bg-white p-4 rounded shadow-sm'>
-        <form onSubmit={handleSubmit}>
-
-          <div className='row'>
-            <div className='col-md-6'>
-              <label className='fw-bold mb-1'>Ação realizada</label>
-              <input
-                className='form-control mb-2'
-                value={acao}
-                onChange={(e) => setAcao(e.target.value)}
-              />
-              {errors.acao_realizada && <small className="text-danger">{errors.acao_realizada}</small>}
-            </div>
-
-            <div className='col-md-6'>
-              <label className='fw-bold mb-1'>Fotografias?</label>
-              <select
-                className='form-select'
-                value={foto}
-                onChange={(e) => setFoto(e.target.value)}
-              >
-                <option value="">Selecione</option>
-                <option value="SIM">SIM</option>
-                <option value="NAO">NÃO</option>
-              </select>
-              {errors.foto && <small className="text-danger">{errors.foto}</small>}
-            </div>
+    <div className='solic-container'>
+      <div className='solic-wrapper'>
+        {/* Header */}
+        <div className='solic-header'>
+          <div className='solic-header-content'>
+            <h1 className='solic-title'>Solicitação de Pesquisa</h1>
+            <p className='solic-subtitle'>Preencha os dados da sua pesquisa científica</p>
           </div>
+          <div className='solic-accent-shape'></div>
+        </div>
 
-          <br />
-
-          <div className='row'>
-            <div className='col-md-6'>
-              <label className='fw-bold'>Área de atuação:</label>
-              <div className='border p-2 rounded' style={{ maxHeight: '150px', overflowY: 'auto' }}>
-                {choicesArea.map((area) => (
-                  <div key={area.value} className="form-check">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      checked={areaAtuacao.includes(area.value)}
-                      onChange={() => handleCheckboxChangeArea(area.value)}
-                    />
-                    <label className="form-check-label">
-                      {area.label}
-                    </label>
-                  </div>
-                ))}
+        <form onSubmit={handleSubmit} className='solic-form'>
+          {/* Seção 1: Ação e Fotos */}
+          <div className='solic-section'>
+            <h2 className='solic-section-title'>Informações Básicas</h2>
+            <div className='solic-grid-2'>
+              <div className='solic-field'>
+                <label className='solic-label'>Ação realizada</label>
+                <input
+                  className='solic-input'
+                  placeholder='Descreva a ação principal'
+                  value={acao}
+                  onChange={(e) => setAcao(e.target.value)}
+                />
+                {errors.acao_realizada && (
+                  <span className='solic-error'>{errors.acao_realizada}</span>
+                )}
               </div>
-            </div>
 
-            <div className='col-md-6'>
-              <label className='fw-bold'>Unidades:</label>
-              <div className='border p-2 rounded' style={{ maxHeight: '150px', overflowY: 'auto' }}>
-                {/* 3. Renderização dinâmica mapeada a partir do estado */}
-                {choicesUCS.map((uc) => (
-                  <div key={uc.value} className="form-check">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      checked={unidade.includes(uc.value)}
-                      onChange={() => handleCheckboxChangeUnidade(uc.value)}
-                    />
-                    <label className="form-check-label">
-                      {uc.label}
-                    </label>
-                  </div>
-                ))}
+              <div className='solic-field'>
+                <label className='solic-label'>Fotografias?</label>
+                <select
+                  className='solic-select'
+                  value={foto}
+                  onChange={(e) => setFoto(e.target.value)}
+                >
+                  <option value="">Selecione uma opção</option>
+                  <option value="SIM">✓ SIM</option>
+                  <option value="NAO">✗ NÃO</option>
+                </select>
+                {errors.foto && (
+                  <span className='solic-error'>{errors.foto}</span>
+                )}
               </div>
             </div>
           </div>
 
-          <br />
+          {/* Seção 2: Área e Unidades */}
+          <div className='solic-section'>
+            <h2 className='solic-section-title'>Escopo</h2>
+            <div className='solic-grid-2'>
+              <div className='solic-field'>
+                <label className='solic-label'>Área de atuação</label>
+                <div className='solic-checkbox-group'>
+                  {choicesArea.map((area) => (
+                    <label key={area.value} className='solic-checkbox'>
+                      <input
+                        type='checkbox'
+                        checked={areaAtuacao.includes(area.value)}
+                        onChange={() => handleCheckboxChangeArea(area.value)}
+                        className='solic-checkbox-input'
+                      />
+                      <span className='solic-checkbox-mark'></span>
+                      <span className='solic-checkbox-label'>{area.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
 
-          <div className='row'>
-            <div className='col-md-6'>
-              <label className='fw-bold'>Licença</label>
-              <input
-                className="form-control"
-                value={licenca}
-                onChange={(e) => setLicenca(e.target.value)}
-              />
-            </div>
-
-            <div className='col-md-6'>
-              <label className='fw-bold'>Benefícios</label>
-              <input
-                className='form-control'
-                value={retComun}
-                onChange={(e) => setRetCom(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <br />
-
-          <div className='row'>
-            <div className='col-md-6'>
-              <label className='fw-bold'>Data início</label>
-              <input
-                type="date"
-                className="form-control"
-                value={dataInic}
-                onChange={(e) => setDataInic(e.target.value)}
-              />
-            </div>
-
-            <div className='col-md-6'>
-              <label className='fw-bold'>Data fim</label>
-              <input
-                type="date"
-                className="form-control"
-                value={dataFim}
-                onChange={(e) => setDataFim(e.target.value)}
-              />
+              <div className='solic-field'>
+                <label className='solic-label'>Unidades de Conservação</label>
+                <div className='solic-checkbox-group'>
+                  {choicesUCS.map((uc) => (
+                    <label key={uc.value} className='solic-checkbox'>
+                      <input
+                        type='checkbox'
+                        checked={unidade.includes(uc.value)}
+                        onChange={() => handleCheckboxChangeUnidade(uc.value)}
+                        className='solic-checkbox-input'
+                      />
+                      <span className='solic-checkbox-mark'></span>
+                      <span className='solic-checkbox-label'>{uc.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
-          <button type="submit" className="btn btn-primary mt-4">Enviar</button>
+          {/* Seção 3: Documentação */}
+          <div className='solic-section'>
+            <h2 className='solic-section-title'>Documentação</h2>
+            <div className='solic-grid-2'>
+              <div className='solic-field'>
+                <label className='solic-label'>Número de Licença</label>
+                <input
+                  className='solic-input'
+                  placeholder='Ex: IBAMA 2024/001'
+                  value={licenca}
+                  onChange={(e) => setLicenca(e.target.value)}
+                />
+              </div>
+
+              <div className='solic-field'>
+                <label className='solic-label'>Benefícios Gerados</label>
+                <input
+                  className='solic-input'
+                  placeholder='Descreva os retornos à comunidade'
+                  value={retComun}
+                  onChange={(e) => setRetCom(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Seção 4: Datas */}
+          <div className='solic-section'>
+            <h2 className='solic-section-title'>Período da Atividade</h2>
+            <div className='solic-grid-2'>
+              <div className='solic-field'>
+                <label className='solic-label'>Data de Início</label>
+                <input
+                  type='date'
+                  className='solic-input'
+                  value={dataInic}
+                  onChange={(e) => setDataInic(e.target.value)}
+                />
+              </div>
+
+              <div className='solic-field'>
+                <label className='solic-label'>Data de Término</label>
+                <input
+                  type='date'
+                  className='solic-input'
+                  value={dataFim}
+                  onChange={(e) => setDataFim(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Botão Submit */}
+          <div className='solic-footer'>
+            <button
+              type='submit'
+              className={`solic-button ${loading ? 'loading' : ''}`}
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <span className='solic-spinner'></span>
+                  Enviando...
+                </>
+              ) : (
+                <>
+                  <span className='solic-button-icon'>↳</span>
+                  Enviar Solicitação
+                </>
+              )}
+            </button>
+          </div>
         </form>
       </div>
     </div>

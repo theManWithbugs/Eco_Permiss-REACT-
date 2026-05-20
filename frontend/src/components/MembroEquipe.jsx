@@ -2,6 +2,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import NavUser from './NavUser';
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import API_URL from "../constants/global.js";
 
 function RenderFormset() {
   const navigate = useNavigate();
@@ -64,7 +65,7 @@ function RenderFormset() {
     };
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/membros_solic_pesq/", {
+      const response = await fetch(`${API_URL}/api/membros_solic_pesq/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

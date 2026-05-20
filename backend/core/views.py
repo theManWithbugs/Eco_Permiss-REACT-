@@ -195,6 +195,19 @@ def solic_ugai(request):
 
     return Response(serializer.errors, status=400)
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def excluir_arq(request):
+
+    id = request.data.get('documento_id')
+    documento = ArquivosRelFinal.objects.get(id=id)
+
+    try:
+        documento.delete()
+        return Response("Ok", status=200)
+    except Exception as e:
+        return Response(f"Ocorreu um erro: {e}", status=500)
+
 class FileUploadView(APIView):
     # Avisa ao Django REST que esta rota processa arquivos e formulários
     parser_classes = (MultiPartParser, FormParser)

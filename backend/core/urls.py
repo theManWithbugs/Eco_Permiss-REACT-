@@ -10,7 +10,8 @@ from .views import (
     solic_ugai,
     membros_pesq,
     FileUploadView,
-    get_url_doc
+    get_url_doc,
+    excluir_arq
 )
 
 urlpatterns = [
@@ -31,6 +32,7 @@ urlpatterns = [
     path('api/get_choices/', get_choices),
     path('api/get_doc/', get_url_doc),
 
+    path('api/excluir_arq/', excluir_arq),
 
     # 🔥 PRINCIPAL
     # Solicitação de pesquisa

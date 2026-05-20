@@ -2,6 +2,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useState, useEffect } from 'react';
 import { redirect, useNavigate } from 'react-router-dom';
 import NavUser from "./NavUser";
+import API_URL from "../constants/global.js";
 
 function MinhasSolicPesq() {
   const navigate = useNavigate();
@@ -11,7 +12,7 @@ function MinhasSolicPesq() {
     const token = localStorage.getItem("access");
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/minhas_solic_pesq/", {
+      const response = await fetch(`${API_URL}/api/minhas_solic_pesq/`, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`

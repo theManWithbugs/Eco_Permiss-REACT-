@@ -6,6 +6,7 @@ import { ToastContainer, toast, Bounce } from 'react-toastify';
 import '../styles/info_pesquisa.css';
 import '../styles/file_info_form.css';
 import DocPesquisa from './DocPesquisa';
+import API_URL from "../constants/global.js";
 
 function InfoPesquisa() {
   const navigate = useNavigate();
@@ -25,9 +26,7 @@ function InfoPesquisa() {
     formData.append('pesquisa_id', obj.id);
 
     try {
-      console.log('Iniciando submit automático do arquivo...');
-
-      const response = await fetch('http://127.0.0.1:8000/api/file_upload/', {
+      const response = await fetch(`${API_URL}/api/file_upload/`, {
         method: 'POST',
         body: formData, // O próprio navegador configura o multipart/form-data automático
       });
@@ -36,6 +35,7 @@ function InfoPesquisa() {
 
       if (response.ok) {
         toast.success(dados);
+        window.location.reload();
       } else {
         toast.error(dados);
       }
@@ -44,6 +44,44 @@ function InfoPesquisa() {
     } finally {
       // Limpa o valor do input para permitir enviar o mesmo arquivo novamente se necessário
       event.target.value = '';
+    }
+  };
+
+  const ucs_ = obj?.unidade_cons || [];
+  const area_atuacao = obj?.area_atuacao || [];
+
+  const payload = {
+    id: obj?.id
+  };
+
+  const buscarMembros = async () => {
+    const token = localStorage.getItem("access");
+    if (!token) {
+      alert("⚠️ Você precisa estar logado");
+      navigate('/login');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/api/membros_equip/`, {
+        method: "POST",
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        // throw new Error("Erro ao buscar dados");
+        toast.error("Erro ao buscar dados");
+      }
+
+      const data = await response.json();
+      setMembros(data);
+
+    } catch (error) {
+      toast.warning(`Houve um erro ao processar sua requisição: ${error}`);
     }
   };
 
@@ -60,44 +98,6 @@ function InfoPesquisa() {
   }, [obj]);
 
   if (!obj) return null;
-
-  const ucs_ = obj.unidade_cons || [];
-  const area_atuacao = obj.area_atuacao || [];
-
-  const payload = {
-    id: obj.id
-  };
-
-  const buscarMembros = async () => {
-    const token = localStorage.getItem("access");
-    if (!token) {
-      alert("⚠️ Você precisa estar logado");
-      navigate('/login');
-      return;
-    }
-
-    try {
-      const response = await fetch('http://127.0.0.1:8000/api/membros_equip/', {
-        method: "POST",
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        throw new Error("Erro ao buscar dados");
-      }
-
-      const data = await response.json();
-      setMembros(data);
-
-    } catch (error) {
-      console.error("Erro ao buscar membros:", error);
-      alert("Houve um erro ao processar sua requisição.");
-    }
-  };
 
   return (
     <div className='container-fluid'>
@@ -156,7 +156,7 @@ function InfoPesquisa() {
           </div>
           <hr />
           <div className='secao'>
-            <h5 className='mb-2'>
+            <h5 className='mb-3'>
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-clipboard-check me-2" viewBox="0 0 16 16">
                 <path fillRule="evenodd" d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
                 <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
@@ -225,14 +225,14 @@ function InfoPesquisa() {
               />
             </label>
           </form>
-            <DocPesquisa id_pesquisa={obj.id} />
+            <DocPesquisa id_pesquisa={obj.id} status_obj={obj.status} />
           <div className="status-card mt-3">
             <div className="row align-items-center">
               <div className="col-12 col-md-4 mb-2 mb-md-0">
                 <strong>Status da Solicitação:</strong>
               </div>
               <div className="col-12 col-md-8">
-                {obj.status === "EM-ANDAMENTO" && (
+                {obj.status === "APROVADO" && (
                   <span className="badge badge-ativo d-flex align-items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-rocket-takeoff me-2" viewBox="0 0 16 16">
                       <path d="M9.752 6.193c.599.6 1.73.437 2.528-.362s.96-1.932.362-2.531c-.599-.6-1.73-.438-2.528.361-.798.8-.96 1.933-.362 2.532"/>
@@ -300,6 +300,15 @@ function InfoPesquisa() {
               </div>
             </div>
           )}
+          <div className="relatorio-footer">
+            <p>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-calendar-check me-1 mb-1" viewBox="0 0 16 16">
+                <path d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+                <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+              </svg>
+              Relatório solicitado em { obj.data_solicitacao }
+            </p>
+          </div>
         </div>
       </div>
     </div>

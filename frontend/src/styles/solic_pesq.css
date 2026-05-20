@@ -1,0 +1,432 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  --primary-color--pesq: #1e5a5a;
+  --primary-light--pesq: #2a7a7a;
+  --primary-dark: #164545;
+  --accent-color: #48a869;
+  --accent-light: #6bbf8a;
+  --danger-color: #e74c3c;
+  --neutral-light: #f8f9fa;
+  --neutral-medium: #e9ecef;
+  --neutral-dark: #495057;
+  --text-primary: #1a1a1a;
+  --text-secondary: #6c757d;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.15);
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Container e Wrapper */
+.solic-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.solic-wrapper {
+  width: 100%;
+  max-width: 900px;
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header */
+.solic-header {
+  background: linear-gradient(135deg, var(--primary-color--pesq) 0%, var(--primary-light--pesq) 100%);
+  color: white;
+  padding: 3rem 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.solic-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 300px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+  transform: translate(50%, -50%);
+}
+
+.solic-header-content {
+  position: relative;
+  z-index: 1;
+}
+
+.solic-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.5px;
+}
+
+.solic-subtitle {
+  font-size: 1rem;
+  font-weight: 400;
+  opacity: 0.95;
+  letter-spacing: 0.3px;
+}
+
+.solic-accent-shape {
+  position: absolute;
+  bottom: -20px;
+  right: 20px;
+  width: 120px;
+  height: 120px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+}
+
+/* Form */
+.solic-form {
+  padding: 3rem 2rem;
+}
+
+/* Sections */
+.solic-section {
+  margin-bottom: 3rem;
+  animation: fadeInUp 0.6s ease-out;
+  animation-fill-mode: both;
+}
+
+.solic-section:nth-child(1) { animation-delay: 0.1s; }
+.solic-section:nth-child(2) { animation-delay: 0.2s; }
+.solic-section:nth-child(3) { animation-delay: 0.3s; }
+.solic-section:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.solic-section-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--primary-color--pesq);
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 2px solid var(--accent-light);
+  display: inline-block;
+}
+
+/* Grid */
+.solic-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+/* Field */
+.solic-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.solic-label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.85rem;
+}
+
+/* Input */
+.solic-input,
+.solic-select {
+  padding: 0.9rem 1rem;
+  border: 2px solid var(--neutral-medium);
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  color: var(--text-primary);
+  background: white;
+  transition: var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+
+.solic-input:focus,
+.solic-select:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 4px rgba(72, 168, 105, 0.1), var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.solic-input::placeholder {
+  color: var(--text-secondary);
+}
+
+/* Checkbox Group */
+.solic-checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 0.5rem;
+  border: 2px solid var(--neutral-medium);
+  border-radius: 8px;
+  background: #fafbfc;
+}
+
+.solic-checkbox-group::-webkit-scrollbar {
+  width: 6px;
+}
+
+.solic-checkbox-group::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.solic-checkbox-group::-webkit-scrollbar-thumb {
+  background: var(--primary-light);
+  border-radius: 3px;
+}
+
+/* Custom Checkbox */
+.solic-checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  transition: var(--transition);
+  padding: 0.5rem;
+  border-radius: 6px;
+}
+
+.solic-checkbox:hover {
+  background: rgba(72, 168, 105, 0.08);
+}
+
+.solic-checkbox-input {
+  display: none;
+}
+
+.solic-checkbox-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  border: 2px solid var(--primary-light);
+  border-radius: 5px;
+  margin-right: 0.8rem;
+  transition: var(--transition);
+  background: white;
+  position: relative;
+}
+
+.solic-checkbox-input:checked + .solic-checkbox-mark {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(72, 168, 105, 0.2);
+}
+
+.solic-checkbox-input:checked + .solic-checkbox-mark::after {
+  content: '✓';
+  color: white;
+  font-size: 0.85rem;
+  font-weight: bold;
+  animation: checkmark 0.3s ease-out;
+}
+
+@keyframes checkmark {
+  0% {
+    transform: scale(0) rotate(-45deg);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+
+.solic-checkbox-label {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* Error */
+.solic-error {
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--danger-color);
+  font-weight: 500;
+  animation: shake 0.3s ease-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* Footer */
+.solic-footer {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--neutral-medium);
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Button */
+.solic-button {
+  padding: 1rem 2.5rem;
+  background: linear-gradient(135deg, var(--accent-color) 0%, var(--primary-color--pesq) 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+}
+
+.solic-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.solic-button:hover:not(.loading) {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+}
+
+.solic-button:hover:not(.loading)::before {
+  left: 100%;
+}
+
+.solic-button:active:not(.loading) {
+  transform: translateY(-1px);
+}
+
+.solic-button:disabled {
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+.solic-button-icon {
+  font-size: 1.2rem;
+}
+
+/* Loading Spinner */
+.solic-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .solic-container {
+    padding: 1rem;
+  }
+
+  .solic-wrapper {
+    border-radius: 12px;
+  }
+
+  .solic-header {
+    padding: 2rem 1.5rem;
+  }
+
+  .solic-title {
+    font-size: 2rem;
+  }
+
+  .solic-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .solic-form {
+    padding: 1.5rem;
+  }
+
+  .solic-section {
+    margin-bottom: 2rem;
+  }
+
+  .solic-grid-2 {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .solic-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .solic-footer {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .solic-title {
+    font-size: 1.5rem;
+  }
+
+  .solic-label {
+    font-size: 0.8rem;
+  }
+
+  .solic-input,
+  .solic-select {
+    font-size: 16px; /* Evita zoom no iOS */
+  }
+}

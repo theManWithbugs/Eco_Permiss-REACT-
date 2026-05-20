@@ -20,10 +20,8 @@ body {
   background-size: cover;
   background-position: center center;
   background-attachment: fixed;
-
   padding: 0 20px;
   padding-top: var(--header-height); /* 🔥 correção principal */
-
   box-sizing: border-box;
   margin-bottom: 80px;
 }
