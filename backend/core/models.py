@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.db.models import Sum
 import uuid
 import os
+import calendar
 
 #Local imports
 from .choices import YES_OR_NOT, CHOICES_STATUS, IDENTIDADE_GENERO_CHOICES, RACA_CHOICES
@@ -195,11 +196,16 @@ class MembroEquipeUGAI(models.Model):
             models.Index(fields=["solicitacao_ref"]),
         ]
 
-def get_upload_path(instance, filename):
+def get_upload_path(_instance, filename):
     ano = timezone.now().year
-    area_atuacao = instance.pesquisa.area_atuacao
+    mes_num = timezone.now().month
+    meses = [
+        None,'janeiro','fevereiro','março','abril','maio','junho',
+        'julho','agosto','setembro','outubro','novembro','dezembro'
+    ]
+    mes = meses[mes_num]
 
-    return os.path.join('rel_final_pesq', str(ano), str(area_atuacao), filename)
+    return os.path.join('rel_final_pesq', str(ano), mes, filename)
 
 class ArquivosRelFinal(models.Model):
     pesquisa = models.ForeignKey(

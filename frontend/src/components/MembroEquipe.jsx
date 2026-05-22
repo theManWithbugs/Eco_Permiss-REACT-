@@ -102,7 +102,6 @@ function RenderFormset() {
   return (
     <>
       <NavUser />
-
       <div className='container'>
         {formsets.map((form, index) => (
           <div key={form.id} className='card p-3 mb-3 border'>

@@ -4,7 +4,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast, Bounce } from 'react-toastify';
 import '../styles/info_pesquisa.css';
-import '../styles/file_info_form.css';
 import DocPesquisa from './DocPesquisa';
 import API_URL from "../constants/global.js";
 
@@ -14,38 +13,6 @@ function InfoPesquisa() {
   const obj = location.state;
 
   const [membros, setMembros] = useState([]);
-
-  // Função que dispara o submit automaticamente ao selecionar o arquivo
-  const handleFileChange = async (event) => {
-    const arquivoSelecionado = event.target.files[0]; // Captura o arquivo individual
-
-    if (!arquivoSelecionado) return;
-
-    const formData = new FormData();
-    formData.append('documento', arquivoSelecionado);
-    formData.append('pesquisa_id', obj.id);
-
-    try {
-      const response = await fetch(`${API_URL}/api/file_upload/`, {
-        method: 'POST',
-        body: formData, // O próprio navegador configura o multipart/form-data automático
-      });
-
-      const dados = await response.json();
-
-      if (response.ok) {
-        toast.success(dados);
-        window.location.reload();
-      } else {
-        toast.error(dados);
-      }
-    } catch (error) {
-      toast.warning(error);
-    } finally {
-      // Limpa o valor do input para permitir enviar o mesmo arquivo novamente se necessário
-      event.target.value = '';
-    }
-  };
 
   const ucs_ = obj?.unidade_cons || [];
   const area_atuacao = obj?.area_atuacao || [];
@@ -91,6 +58,7 @@ function InfoPesquisa() {
     }
   }, [obj, navigate]);
 
+  //Faz a busca novamente sempre que o valor do objeto alterar
   useEffect(() => {
     if (obj) {
       buscarMembros();
@@ -101,19 +69,7 @@ function InfoPesquisa() {
 
   return (
     <div className='container-fluid'>
-      <ToastContainer
-      position="top-right"
-      autoClose={5000}
-      hideProgressBar={false}
-      newestOnTop={false}
-      closeOnClick={false}
-      rtl={false}
-      pauseOnFocusLoss
-      draggable
-      pauseOnHover
-      theme="colored"
-      transition={Bounce}
-      />
+      <ToastContainer />
       <div className='container_sheet'>
         <div className="relatorio-header-section">
           <div className="header-content">
@@ -128,7 +84,6 @@ function InfoPesquisa() {
             </div>
           </div>
         </div>
-
         <div className="card-body p-5">
           <div className='secao'>
             <h5 className='mb-2'>
@@ -205,26 +160,6 @@ function InfoPesquisa() {
             </div>
           </div>
           <hr />
-
-          {/* FORMULÁRIO COM SUBMIT AUTOMÁTICO ADAPTADO */}
-          <form id="fileUploadForm" className="file-upload-form">
-            <label htmlFor="file" className="file-upload-label">
-              <div className="file-upload-design">
-                <svg viewBox="0 0 640 512" height="1em">
-                  <path d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128H144zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39V392c0 13.3 10.7 24 24 24s24-10.7 24-24V257.9l39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"></path>
-                </svg>
-                <p>Arraste e solte</p>
-                <p>ou</p>
-                <span className="browse-button">Selecione</span>
-              </div>
-              <input
-                id="file"
-                type="file"
-                name="documento"
-                onChange={handleFileChange}
-              />
-            </label>
-          </form>
             <DocPesquisa id_pesquisa={obj.id} status_obj={obj.status} />
           <div className="status-card mt-3">
             <div className="row align-items-center">
@@ -300,7 +235,7 @@ function InfoPesquisa() {
               </div>
             </div>
           )}
-          <div className="relatorio-footer">
+          <div className="relatorio-footer mt-2">
             <p>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-calendar-check me-1 mb-1" viewBox="0 0 16 16">
                 <path d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
