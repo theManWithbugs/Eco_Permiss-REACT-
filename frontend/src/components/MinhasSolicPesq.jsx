@@ -4,7 +4,6 @@ import { redirect, useNavigate } from 'react-router-dom';
 import NavUser from "./NavUser";
 import API_URL from "../constants/global.js";
 import { ToastContainer } from 'react-toastify';
-
 import "../styles/btn_paginator.css";
 
 function MinhasSolicPesq() {
@@ -75,9 +74,9 @@ function MinhasSolicPesq() {
           {dados.map((item) => (
             <div className='card_items' key={ item.id }>
               <h5 className='text-uppercase'>{ item.acao_realizada }</h5>
+              <p>Data da solicitação: { item.data_solicitacao }</p>
               <a style={{ cursor: 'pointer', color: 'white' }} onClick={() => infoPesquisa(item)}>
                 Ver detalhes</a>
-              <p>ID atual: { item.id }</p>
             </div>
           ))}
 

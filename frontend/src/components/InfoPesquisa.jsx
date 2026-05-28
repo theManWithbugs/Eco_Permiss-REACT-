@@ -52,6 +52,10 @@ function InfoPesquisa() {
     }
   };
 
+  function AddMembro() {
+    navigate('/membros_equipe', { state: obj.id });
+  }
+
   useEffect(() => {
     if (!obj) {
       navigate('/minhas_solic');
@@ -210,6 +214,9 @@ function InfoPesquisa() {
             </div>
           </div>
             <hr />
+            <div>
+              <button onClick={() => AddMembro()}>Adicionar membros</button>
+            </div>
           {membros.length > 0 && (
             <div className="membros-section">
               <div className="membros-header">

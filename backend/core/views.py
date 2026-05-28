@@ -70,15 +70,28 @@ def minhas_solic_ugai(request):
     """
     Retorna as solicitações de UGAI do usuário autenticado.
     """
-    try:
-        objs = SolicitacaoUgais.objects.filter(user_solic=request.user)
-        if not objs.exists():
-            return Response("Nenhuma solicitação realizada", status=404)
-        serializer = SerializerGetDataUgai(objs, many=True)
-        return Response(serializer.data, status=200)
-    except Exception as e:
-        # ATENÇÃO: Logar exceções em produção
-        return Response(f"Ocorreu um erro: {e}", status=500)
+
+    objs = SolicitacaoUgais.objects.filter(
+        user_solic=request.user).order_by('-data_solicitacao')
+
+    page_number = request.GET.get('page', 1)
+    paginator = Paginator(objs, 10)
+    page_obj = paginator.get_page(page_number)
+
+    itens_json = []
+    for item in page_obj:
+        d = model_to_dict(item)
+        d["ugai"] = str(item.ugai)
+        d['id'] = str(item.id)
+        itens_json.append(d)
+
+    return JsonResponse({
+        'objs': itens_json,
+        'currentPage': page_obj.number,
+        'totalPages': paginator.num_pages,
+        'hasNext': page_obj.has_next(),
+        'hasPrevious': page_obj.has_previous()
+    })
 
 
 @api_view(['GET'])
@@ -125,16 +138,14 @@ def solic_pesquisa(request):
     Cria uma nova solicitação de pesquisa.
     """
     serializer = SerializerSolicPesq(data=request.data)
+
     if serializer.is_valid():
         obj = serializer.save(
             user_solic=request.user,
             status="PENDENTE"
         )
-        print("\n==== SALVO ====")
-        print(obj)
-        return Response(obj.id)
-    print("\n==== ERROS ====")
-    print(serializer.errors)
+        serializer_get = SerializerGetDataPesq(instance=obj)
+        return Response(serializer_get.data)
     return Response(serializer.errors, status=400)
 
 

@@ -17,11 +17,10 @@ function MinhasSolic() {
   return (
     <>
       <NavUser />
-
       <div className="link-menu-container container">
         <nav className="link-menu">
           <a
-            // #Aplicando lógica diretamnete na classe
+            // #Aplicando lógica diretamente na classe
             className={`menu-btn menu-btn-pesquisa ${component === "pesquisa" ? "active" : ""}`}
             data-page="pesquisa"
             onClick={() => switchComponent("pesquisa")}>

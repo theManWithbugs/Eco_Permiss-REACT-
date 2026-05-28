@@ -1,0 +1,434 @@
+/* ============================================
+   MEMBRO EQUIPE - CSS ISOLADO
+   Componente: MembroEquipe.jsx
+   Estilo: Moderno, Limpo e Sustentável
+   ============================================ */
+
+:root {
+  --membro-primary: #2d7a4a;
+  --membro-secondary: #4a9f6f;
+  --membro-accent: #6fcf97;
+  --membro-light: #e8f5ee;
+  --membro-background: #f5f9f7;
+  --membro-text: #2c3e3a;
+  --membro-border: #c8ddd5;
+  --membro-shadow: rgba(45, 122, 74, 0.1);
+  --membro-error: #e74c3c;
+  --membro-success: #27ae60;
+  --membro-spacing: 1.5rem;
+  --membro-radius: 8px;
+  --membro-transition: 0.3s ease;
+}
+
+/* ============================================
+   CONTAINER PRINCIPAL
+   ============================================ */
+
+.membro-equipe-wrapper {
+  padding: var(--membro-spacing);
+  border-radius: var(--membro-radius);
+  min-height: 100vh;
+}
+
+.membro-equipe-container {
+  border-radius: 5px;
+  padding: 10px;
+  max-width: 1200px;
+  background-color: var(--membro-background);
+  margin: 0 auto;
+}
+
+/* ============================================
+   HEADER DO FORMULÁRIO
+   ============================================ */
+
+.membro-equipe-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid var(--membro-accent);
+}
+
+.membro-equipe-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--membro-primary);
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.5px;
+}
+
+.membro-equipe-subtitle {
+  font-size: 1rem;
+  color: #666;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* ============================================
+   CARD DO MEMBRO
+   ============================================ */
+
+.membro-card {
+  background: white;
+  border: 1px solid var(--membro-border);
+  border-radius: var(--membro-radius);
+  padding: 1.75rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px var(--membro-shadow);
+  transition: all var(--membro-transition);
+  animation: membro-card-enter 0.4s ease-out;
+}
+
+.membro-card:hover {
+  box-shadow: 0 4px 16px rgba(45, 122, 74, 0.15);
+  border-color: var(--membro-secondary);
+  transform: translateY(-2px);
+}
+
+@keyframes membro-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.membro-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--membro-light);
+}
+
+.membro-card-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--membro-primary);
+  margin: 0;
+}
+
+.membro-card-badge {
+  background: linear-gradient(135deg, var(--membro-secondary), var(--membro-accent));
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* ============================================
+   CAMPOS DO FORMULÁRIO
+   ============================================ */
+
+.membro-field-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--membro-spacing);
+  margin-bottom: 1.5rem;
+}
+
+.membro-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.membro-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--membro-text);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.85rem;
+}
+
+.membro-label.required::after {
+  content: " *";
+  color: var(--membro-error);
+}
+
+.membro-input,
+.membro-select {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--membro-border);
+  border-radius: var(--membro-radius);
+  font-size: 1rem;
+  font-family: inherit;
+  background-color: white;
+  color: var(--membro-text);
+  transition: all var(--membro-transition);
+}
+
+.membro-input::placeholder {
+  color: #999;
+  font-style: italic;
+}
+
+.membro-input:focus,
+.membro-select:focus {
+  outline: none;
+  border-color: var(--membro-secondary);
+  box-shadow: 0 0 0 3px rgba(45, 122, 74, 0.1);
+  background-color: rgba(111, 207, 151, 0.02);
+}
+
+.membro-input:disabled,
+.membro-select:disabled {
+  background-color: var(--membro-light);
+  color: #999;
+  cursor: not-allowed;
+}
+
+.membro-select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%232d7a4a' d='M1 4l5 4 5-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+}
+
+/* ============================================
+   VALIDAÇÃO E ERROS
+   ============================================ */
+
+.membro-error-message {
+  color: var(--membro-error);
+  font-size: 0.85rem;
+  margin-top: 0.35rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.membro-error-message::before {
+  content: "⚠";
+  font-size: 1rem;
+}
+
+.membro-input.error,
+.membro-select.error {
+  border-color: var(--membro-error);
+  background-color: rgba(231, 76, 60, 0.05);
+}
+
+.membro-input.error:focus,
+.membro-select.error:focus {
+  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+  border-color: var(--membro-error);
+}
+
+.membro-success {
+  border-color: var(--membro-success);
+  background-color: rgba(39, 174, 96, 0.05);
+}
+
+/* ============================================
+   AÇÕES E BOTÕES
+   ============================================ */
+
+.membro-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--membro-light);
+  flex-wrap: wrap;
+}
+
+.membro-btn {
+  padding: 0.85rem 1.75rem;
+  border: none;
+  border-radius: var(--membro-radius);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--membro-transition);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: inherit;
+}
+
+.membro-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.membro-btn-add {
+  background: linear-gradient(135deg, var(--membro-secondary), var(--membro-primary));
+  color: white;
+  box-shadow: 0 4px 12px rgba(45, 122, 74, 0.2);
+}
+
+.membro-btn-add:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--membro-primary), var(--membro-secondary));
+  box-shadow: 0 6px 20px rgba(45, 122, 74, 0.3);
+  transform: translateY(-2px);
+}
+
+.membro-btn-add::before {
+  content: "+";
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.membro-btn-submit {
+  background: linear-gradient(135deg, var(--membro-accent), var(--membro-secondary));
+  color: white;
+  box-shadow: 0 4px 12px rgba(111, 207, 151, 0.2);
+}
+
+.membro-btn-submit:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--membro-secondary), var(--membro-accent));
+  box-shadow: 0 6px 20px rgba(111, 207, 151, 0.3);
+  transform: translateY(-2px);
+}
+
+.membro-btn-remove {
+  background-color: rgba(231, 76, 60, 0.1);
+  color: var(--membro-error);
+  border: 1px solid var(--membro-error);
+}
+
+.membro-btn-remove:hover:not(:disabled) {
+  background-color: var(--membro-error);
+  color: white;
+}
+
+.membro-btn:active {
+  transform: translateY(0);
+}
+
+.membro-btn-group {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* ============================================
+   LOADING STATE
+   ============================================ */
+
+.membro-btn.loading {
+  position: relative;
+  color: transparent;
+}
+
+.membro-btn.loading::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: 50%;
+  left: 50%;
+  margin: -8px 0 0 -8px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: membro-spin 0.8s linear infinite;
+}
+
+@keyframes membro-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================
+   RESPONSIVO
+   ============================================ */
+
+@media (max-width: 768px) {
+  .membro-equipe-wrapper {
+    padding: 1rem;
+  }
+
+  .membro-equipe-title {
+    font-size: 1.5rem;
+  }
+
+  .membro-card {
+    padding: 1.25rem;
+  }
+
+  .membro-field-group {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .membro-actions {
+    flex-direction: column;
+  }
+
+  .membro-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .membro-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .membro-card-badge {
+    align-self: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .membro-equipe-title {
+    font-size: 1.25rem;
+  }
+
+  .membro-label {
+    font-size: 0.8rem;
+  }
+
+  .membro-input,
+  .membro-select {
+    font-size: 16px;
+    padding: 0.65rem 0.85rem;
+  }
+
+  .membro-btn {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* ============================================
+   ACESSIBILIDADE
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .membro-card,
+  .membro-input,
+  .membro-btn {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* Focus Visible para Keyboard Navigation */
+.membro-input:focus-visible,
+.membro-select:focus-visible,
+.membro-btn:focus-visible {
+  outline: 2px solid var(--membro-secondary);
+  outline-offset: 2px;
+}
+
+/* Hint de campo obrigatório */
+.membro-required-hint {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 0.25rem;
+  font-style: italic;
+}

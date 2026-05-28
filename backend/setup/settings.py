@@ -96,11 +96,9 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # INTERNACIONALIZAÇÃO
 # ========================
 LANGUAGE_CODE = 'pt-br'
-TIME_ZONE = 'UTC'
-
+TIME_ZONE = 'America/Rio_Branco'
 USE_I18N = True
 USE_TZ = True
-
 # ========================
 # STATIC
 # ========================

@@ -10,6 +10,7 @@ import InfoPesquisa from "./pages/PageInfoPesq";
 import PageInfoPesq from "./pages/PageInfoPesq";
 import PageUsuario from "./pages/PageUsuario";
 import PageSolicUgai from "./pages/PageSolicUgai";
+import PageInfoUgai from "./pages/PageInfoUgai";
 
 function App() {
   return (
@@ -68,6 +69,15 @@ function App() {
           element={
             <PrivateRoute>
               <PageInfoPesq />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/info_ugai"
+          element={
+            <PrivateRoute>
+              <PageInfoUgai />
             </PrivateRoute>
           }
         />
