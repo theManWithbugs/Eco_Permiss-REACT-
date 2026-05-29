@@ -5,14 +5,14 @@
    ============================================ */
 
 :root {
-  --membro-primary: #2d7a4a;
-  --membro-secondary: #4a9f6f;
-  --membro-accent: #6fcf97;
-  --membro-light: #e8f5ee;
-  --membro-background: #f5f9f7;
-  --membro-text: #2c3e3a;
-  --membro-border: #c8ddd5;
-  --membro-shadow: rgba(45, 122, 74, 0.1);
+  --membro-primary: #185fa5;
+  --membro-secondary: #378add;
+  --membro-accent: #85b7eb;
+  --membro-light: #e6f1fb;
+  --membro-background: #f0f6fd;
+  --membro-text: #0c2d4a;
+  --membro-border: #b5d4f4;
+  --membro-shadow: rgba(24, 95, 165, 0.1);
   --membro-error: #e74c3c;
   --membro-success: #27ae60;
   --membro-spacing: 1.5rem;
@@ -79,7 +79,7 @@
 }
 
 .membro-card:hover {
-  box-shadow: 0 4px 16px rgba(45, 122, 74, 0.15);
+  box-shadow: 0 4px 16px rgba(24, 95, 165, 0.15);
   border-color: var(--membro-secondary);
   transform: translateY(-2px);
 }
@@ -172,8 +172,8 @@
 .membro-select:focus {
   outline: none;
   border-color: var(--membro-secondary);
-  box-shadow: 0 0 0 3px rgba(45, 122, 74, 0.1);
-  background-color: rgba(111, 207, 151, 0.02);
+  box-shadow: 0 0 0 3px rgba(24, 95, 165, 0.1);
+  background-color: rgba(133, 183, 235, 0.02);
 }
 
 .membro-input:disabled,
@@ -186,7 +186,7 @@
 .membro-select {
   cursor: pointer;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%232d7a4a' d='M1 4l5 4 5-4'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23185fa5' d='M1 4l5 4 5-4'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 1rem center;
   padding-right: 2.5rem;
@@ -265,12 +265,12 @@
 .membro-btn-add {
   background: linear-gradient(135deg, var(--membro-secondary), var(--membro-primary));
   color: white;
-  box-shadow: 0 4px 12px rgba(45, 122, 74, 0.2);
+  box-shadow: 0 4px 12px rgba(24, 95, 165, 0.2);
 }
 
 .membro-btn-add:hover:not(:disabled) {
   background: linear-gradient(135deg, var(--membro-primary), var(--membro-secondary));
-  box-shadow: 0 6px 20px rgba(45, 122, 74, 0.3);
+  box-shadow: 0 6px 20px rgba(24, 95, 165, 0.3);
   transform: translateY(-2px);
 }
 
@@ -283,12 +283,12 @@
 .membro-btn-submit {
   background: linear-gradient(135deg, var(--membro-accent), var(--membro-secondary));
   color: white;
-  box-shadow: 0 4px 12px rgba(111, 207, 151, 0.2);
+  box-shadow: 0 4px 12px rgba(133, 183, 235, 0.2);
 }
 
 .membro-btn-submit:hover:not(:disabled) {
   background: linear-gradient(135deg, var(--membro-secondary), var(--membro-accent));
-  box-shadow: 0 6px 20px rgba(111, 207, 151, 0.3);
+  box-shadow: 0 6px 20px rgba(133, 183, 235, 0.3);
   transform: translateY(-2px);
 }
 

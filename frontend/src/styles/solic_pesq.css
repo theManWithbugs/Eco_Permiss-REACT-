@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+@import url('../styles/fonts_google.css');
 
 :root {
   --primary-color--pesq: #1e5a5a;
@@ -20,7 +20,7 @@
 
 /* Container e Wrapper */
 .solic-container {
-  min-height: 100vh;
+  /* min-height: 100vh; */
   display: flex;
   align-items: center;
   justify-content: center;

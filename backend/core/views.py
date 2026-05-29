@@ -4,7 +4,7 @@ from .serializers import *
 from .models import DadosSolicPesquisa, Ugai, SolicitacaoUgais, ArquivosRelFinal
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
-from .choices import UCS_CHOICES, CHOICES_AREA_ATUACAO
+from .choices import UCS_CHOICES, CHOICES_AREA_ATUACAO, CHOICES_UGAIS
 
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -100,11 +100,17 @@ def get_choices(request):
     """
     Retorna as opções de choices para UCS e área de atuação.
     """
+    #Choices solic_pesq
     ucs = UCS_CHOICES
     areas_atuacao = CHOICES_AREA_ATUACAO
+
+    #Choices solic_ugai
+    ugais = CHOICES_UGAIS
     dados = {
         "choices_ucs": ucs,
-        "choices_area": areas_atuacao
+        "choices_area": areas_atuacao,
+        "choices_ugais": ugais
+
     }
     return Response(data=dados, status=200)
 

@@ -113,7 +113,7 @@ function InfoPesquisa() {
               </div>
             </div>
           </div>
-          <hr />
+            <hr />
           <div className='secao'>
             <h5 className='mb-3'>
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-clipboard-check me-2" viewBox="0 0 16 16">
@@ -138,7 +138,7 @@ function InfoPesquisa() {
               </div>
             </div>
           </div>
-          <hr />
+            <hr />
           <div className='secao'>
             <h5 className='mb-2'>
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-flower1 me-2" viewBox="0 0 16 16">
@@ -163,7 +163,7 @@ function InfoPesquisa() {
               </div>
             </div>
           </div>
-          <hr />
+            <hr />
             <DocPesquisa id_pesquisa={obj.id} status_obj={obj.status} />
           <div className="status-card mt-3">
             <div className="row align-items-center">
