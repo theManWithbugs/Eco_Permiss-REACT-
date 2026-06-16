@@ -2,13 +2,52 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
-from django.db.models import Sum
 import uuid
 import os
-import calendar
 
 #Local imports
-from .choices import YES_OR_NOT, CHOICES_STATUS, IDENTIDADE_GENERO_CHOICES, RACA_CHOICES
+from .choices import *
+from .utils import *
+
+def validate_file_size(value):
+    limit = 5 * 1024 * 1024  # 5 Megabytes em bytes
+    if value.size > limit:
+        raise ValidationError('O arquivo não pode ser maior que 5MB.')
+
+def get_path_rel(_instance, filename):
+    ano = timezone.now().year
+    mes_num = timezone.now().month
+    meses = [
+        None,'janeiro','fevereiro','março','abril','maio','junho',
+        'julho','agosto','setembro','outubro','novembro','dezembro'
+    ]
+    mes = meses[mes_num]
+
+    return os.path.join('docs_pesquisa', str(ano), mes, 'rel_final', filename)
+
+def get_path_doc(_instance, filename):
+    ano = timezone.now().year
+    mes_num = timezone.now().month
+    meses = [
+        None,'janeiro','fevereiro','março','abril','maio','junho',
+        'julho','agosto','setembro','outubro','novembro','dezembro'
+    ]
+    mes = meses[mes_num]
+
+    return os.path.join('doc_usuario', str(ano), mes, filename)
+
+
+def get_path_membro_doc(_instance, filename):
+    ano = timezone.now().year
+    mes_num = timezone.now().month
+    meses = [
+        None,'janeiro','fevereiro','março','abril','maio','junho',
+        'julho','agosto','setembro','outubro','novembro','dezembro'
+    ]
+    mes = meses[mes_num]
+
+    return os.path.join('docs_pesquisa', str(ano), mes, 'doc_membro_equipe', filename)
+
 
 class User(AbstractUser):
     id = models.UUIDField(
@@ -17,8 +56,56 @@ class User(AbstractUser):
         editable=False
     )
 
+class DadosPessoais(models.Model):
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name='dados_pessoais')
+    sexo = models.CharField(choices=SEXO, blank=False, null=False, max_length=10)
+    estado = models.CharField(
+        choices=ESTADOS_BRASIL_CHOICES, blank=False, null=False, max_length=20)
+    municipio = models.CharField(max_length=80, blank=False, null=False)
+    logradouro = models.CharField(blank=False, null=False, max_length=30)
+    numero = models.IntegerField(blank=False, null=False)
+    bairro = models.CharField(max_length=80, blank=False, null=False)
+    telefone = models.CharField(max_length=13)
+    rg = models.CharField(blank=False, null=False,
+                          max_length=20, verbose_name='RG', unique=True)
+    org_emiss = models.CharField(
+        blank=False, null=False, max_length=30, verbose_name='Orgão emissor(RG)')
+    cpf = models.CharField(blank=False, null=False, validators=[
+                           validador_cpf], max_length=14, verbose_name='CPF', unique=True)
+    telefone_fixo = models.CharField(max_length=10, blank=True, null=True)
+    cep = models.CharField(blank=False, null=False,
+                           max_length=9, verbose_name='CEP')
+    profissao = models.CharField(blank=False, null=False,
+                              max_length=30, verbose_name='Profissão/Ocupação')
+
+    def __str__(self):
+        return self.usuario.get_full_name() or self.usuario.username
+
+    class Meta:
+        db_table = "dados_pessoais"
+
+class UnidadesConservacao(models.Model):
+    id = models.BigAutoField(primary_key=True, editable=False)
+    nome = models.CharField(max_length=80, blank=False, null=False)
+
+    def __str__(self):
+        return f"{self.nome}"
+
+    class Meta:
+        db_table = "unidades_conserv"
+
+class AreaAtuacao(models.Model):
+    id = models.BigAutoField(primary_key=True, editable=False)
+    nome = models.CharField(max_length=80, blank=False, null=False)
+
+    def __str__(self):
+        return f"{self.nome}"
+
+    class Meta:
+        db_table = "area_atuacao"
+
 class DadosSolicPesquisa(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.BigAutoField(primary_key=True)
 
     user_solic = models.ForeignKey(
         User,
@@ -27,27 +114,54 @@ class DadosSolicPesquisa(models.Model):
     )
 
     data_solicitacao = models.DateField(default=timezone.localdate)
-
-    acao_realizada = models.CharField(max_length=80)
-
-    unidade_cons = models.CharField(max_length=500)
+    acao_realizada = models.CharField(max_length=80, blank=False)
+    unidades = models.ManyToManyField(UnidadesConservacao)
 
     foto = models.CharField(
         choices=YES_OR_NOT,
-        max_length=3
+        max_length=3,
+        blank=False,
+        null=False
     )
 
-    licenca_inst = models.CharField(max_length=120)
+    inicio_atividade = models.DateField(default=timezone.localdate, blank=False, null=False)
+    final_atividade = models.DateField(default=timezone.localdate, blank=False, null=False)
+    retorno_comuni = models.CharField(max_length=150, blank=False)
+    area_atuacao = models.ManyToManyField(AreaAtuacao)
 
-    inicio_atividade = models.DateField(default=timezone.localdate)
-    final_atividade = models.DateField(default=timezone.localdate)
+    gestor_resp = models.CharField(
+        max_length=80,
+        blank=True,
+        null=True
+    )
 
-    retorno_comuni = models.CharField(max_length=150)
+    recusa_motivo = models.CharField(
+        max_length=400,
+        blank=True,
+        null=True
+    )
 
-    area_atuacao = models.CharField(max_length=500)
+    # Documentos obrigatórios
+    doc_ident = models.FileField(
+        upload_to=get_path_doc,
+        blank=False,
+        null=False,
+        validators=[validate_file_size]
+    )
 
-    gestor_resp = models.CharField(max_length=80, blank=True, null=True)
-    recusa_motivo = models.CharField(max_length=400, blank=True, null=True)
+    doc_cpf = models.FileField(
+        upload_to=get_path_doc,
+        blank=False,
+        null=False,
+        validators=[validate_file_size]
+    )
+
+    doc_seg_vida = models.FileField(
+        upload_to=get_path_doc,
+        blank=False,
+        null=False,
+        validators=[validate_file_size]
+    )
 
     status = models.CharField(
         choices=CHOICES_STATUS,
@@ -57,45 +171,114 @@ class DadosSolicPesquisa(models.Model):
     def __str__(self):
         return f"{self.user_solic} - {self.data_solicitacao}"
 
-    def save(self, *args, **kwargs):
-        for field in self._meta.fields:
-            if isinstance(field, models.CharField):
-                value = getattr(self, field.name)
-                if value:
-                    setattr(self, field.name, value.upper())
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     for field in self._meta.concrete_fields:
+    #         if isinstance(field, models.CharField):
+    #             value = getattr(self, field.name)
+    #             if value:
+    #                 setattr(self, field.name, value.upper())
+
+    #     super().save(*args, **kwargs)
+
+    def clean(self):
+        super().clean() # Mantém as validações nativas do django
+        # Valida se a data inicial não é maior que a data atual
+        if self.inicio_atividade and self.final_atividade:
+            if self.inicio_atividade > self.final_atividade:
+                raise ValidationError({
+                    'final_atividade': 'A data final da atividade não pode ser anterior à data de início.'
+                })
 
     class Meta:
         db_table = "solic_pesquisa"
 
 
-class MembroEquipe(models.Model):
+class AnexExtraPesqLicenca(models.Model):
+    id = models.BigAutoField(
+        primary_key=True,
+        editable=False
+    )
+
+    solicitacao = models.ForeignKey(
+        DadosSolicPesquisa,
+        on_delete=models.CASCADE,
+        related_name='licencas'
+    )
+
+    doc_url = models.FileField(
+        upload_to=get_path_doc,
+        validators=[validate_file_size]
+    )
+
+    class Meta:
+        db_table = "anex_pesq_licenca"
+
+class AnexExtraPesqOutros(models.Model):
+    id = models.BigAutoField(
+        primary_key=True,
+        editable=False
+    )
+
+    solicitacao = models.ForeignKey(
+        DadosSolicPesquisa,
+        on_delete=models.CASCADE,
+        related_name='outros_documentos'
+    )
+
+    doc_url = models.FileField(
+        upload_to=get_path_doc,
+        validators=[validate_file_size]
+    )
+
+    class Meta:
+        db_table = "anex_pesq_outros"
+
+class MembroEquipePesq(models.Model):
     pesquisa = models.ForeignKey(
         DadosSolicPesquisa, on_delete=models.CASCADE, related_name='pesquisa')
     nome = models.CharField(blank=False, null=False, max_length=80)
     rg = models.CharField(blank=False, null=False,
-                          max_length=11, verbose_name='RG')
-    cpf = models.CharField(blank=False, null=False, max_length=11, verbose_name='CPF')
+                          max_length=20, verbose_name='RG')
+    cpf = models.CharField(blank=False, null=False, max_length=14, verbose_name='CPF')
     ori_sexual = models.CharField(blank=False, null=False, choices=IDENTIDADE_GENERO_CHOICES,
                                   max_length=12, verbose_name='Orientação sexual')
     instituicao = models.CharField(
         blank=False, null=False, verbose_name='Instituição', max_length=80)
-    email = models.CharField(max_length=80, blank=False, null=False, verbose_name='Email')
+    email = models.EmailField(max_length=80, blank=False, null=False, verbose_name='Email')
     email_enviado = models.BooleanField(default=False)
     confirmado = models.BooleanField(default=False)
     token_confirmacao = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    data_confirmacao = models.DateTimeField(null=True, blank=True)
+    data_confirm = models.DateTimeField(null=True, blank=True)
 
     def confirmar(self):
         self.confirmado = True
-        self.data_confirmacao = timezone.now()
+        self.data_confirm = timezone.now()
         self.save()
 
     def __str__(self):
         return f"{self.nome}"
 
+class AnexoMembroEquipe(models.Model):
+    membro = models.ForeignKey(
+        'MembroEquipePesq',
+        on_delete=models.CASCADE,
+        related_name='anexos'
+    )
+
+    nome_original = models.CharField(max_length=255, blank=True, null=True)
+    upado_em = models.DateTimeField(default=timezone.now)
+
+    doc_ident = models.FileField(upload_to=get_path_doc)
+    doc_cpf = models.FileField(upload_to=get_path_doc)
+    doc_seg_vida = models.FileField(upload_to=get_path_doc)
+    doc_cart_vacin = models.FileField(upload_to=get_path_doc)
+
+    def __str__(self):
+        return self.nome_original or self.documento.name
+
+
 class Ugai(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.BigAutoField(primary_key=True)
     nome = models.CharField(max_length=80)
     total_vagas = models.PositiveIntegerField()
 
@@ -107,25 +290,28 @@ class Ugai(models.Model):
 
     #"lte less than or equal", menor ou igual a data que foi solicitada
     #"gte greater than or equal": maior ou igual a data que foi solicitada
-    def vagas_ocupadas(self, inicio, fim):
-        resultado = self.solicitacoes.filter(
-            status=True,
-            data_inicio__lte=fim,
-            data_final__gte=inicio
-        ).aggregate(total=Sum("quantidade_pessoas"))
+    # def vagas_ocupadas(self, inicio, fim):
+    #     resultado = self.solicitacoes.filter(
+    #         status='APROVADO',
+    #         data_inicio__lte=fim,
+    #         data_final__gte=inicio
+    #     ).aggregate(
+    #         total=Sum("quantidade_pessoas")
+    #     )
 
-        return resultado['total'] or 0
+    #     return resultado["total"] or 0
 
-    # 🔹 Calcula vagas disponíveis
-    def vagas_disponiveis(self, inicio, fim):
-        return self.total_vagas - self.vagas_ocupadas(inicio, fim)
+    # # 🔹 Calcula vagas disponíveis
+    # def vagas_disponiveis(self, inicio, fim):
+    #     return self.total_vagas - self.vagas_ocupadas(inicio, fim)
 
-class SolicitacaoUgais(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+class DadosSolicUgai(models.Model):
+    id = models.BigAutoField(primary_key=True)
 
     user_solic = models.ForeignKey(
-        "User",
-        on_delete=models.CASCADE
+        User,
+        on_delete=models.CASCADE,
+        related_name="solicitacoes_ugai"
     )
 
     ugai = models.ForeignKey(
@@ -136,56 +322,102 @@ class SolicitacaoUgais(models.Model):
 
     quantidade_pessoas = models.PositiveIntegerField()
 
-    instituicao = models.CharField(max_length=40, blank=True, null=True, verbose_name='Instituição')
-    setor = models.CharField(max_length=40, blank=True, null=True)
-    cargo = models.CharField(max_length=40, blank=True, null=True)
+    instituicao = models.CharField(
+        max_length=40,
+        blank=True,
+        null=True,
+        verbose_name='Instituição'
+    )
 
-    ativ_desenv = models.CharField(max_length=200, blank=False, null=False, verbose_name='Atividades que irá desenvolver')
-    publico_alvo = models.CharField(max_length=80, blank=False, null=False, verbose_name='Público alvo')
+    setor = models.CharField(
+        max_length=40,
+        blank=True,
+        null=True
+    )
 
-    recusa_motivo = models.CharField(max_length=400, blank=True, null=True)
+    cargo = models.CharField(
+        max_length=40,
+        blank=True,
+        null=True
+    )
 
-    status = models.CharField(choices=CHOICES_STATUS, blank=False, null=False, max_length=10)
+    ativ_desenv = models.CharField(
+        max_length=200,
+        verbose_name='Atividades que irá desenvolver'
+    )
 
-    data_solicitacao = models.DateField(default=timezone.localdate)
-    data_inicio = models.DateField(default=timezone.localdate)
-    data_final = models.DateField(default=timezone.localdate)
+    publico_alvo = models.CharField(
+        max_length=80,
+        verbose_name='Público alvo'
+    )
 
-    def __str__(self):
-        return f"{self.ugai.nome} - {self.user_solic}"
+    recusa_motivo = models.CharField(
+        max_length=400,
+        blank=True,
+        null=True
+    )
+
+    status = models.CharField(
+        choices=CHOICES_STATUS,
+        max_length=10
+    )
+
+    data_solicitacao = models.DateField(
+        default=timezone.localdate
+    )
+
+    data_inicio = models.DateField(
+        default=timezone.localdate
+    )
+
+    data_final = models.DateField(
+        default=timezone.localdate
+    )
 
     class Meta:
         db_table = "solic_ugai"
         indexes = [
-            models.Index(fields=["ugai", "data_inicio", "data_final"]),
+            models.Index(
+                fields=["ugai", "data_inicio", "data_final"]
+            ),
         ]
 
-    # Validação de período
+    def __str__(self):
+        return f"{self.ugai.nome} - {self.user_solic}"
+
     def clean(self):
         if self.data_inicio > self.data_final:
-            raise ValidationError("Data final não pode ser menor que data inicial.")
-
-        # Só valida vagas se estiver sendo aprovada
-        if self.status:
-            vagas = self.ugai.vagas_disponiveis(self.data_inicio, self.data_final)
-            if vagas <= 0:
-                raise ValidationError("Não há vagas disponíveis para esse período.")
+            raise ValidationError(
+                "Data final não pode ser menor que data inicial."
+            )
 
     def save(self, *args, **kwargs):
         for field in self._meta.fields:
             value = getattr(self, field.name)
-            if isinstance(field, models.CharField) and value is not None:
-                setattr(self, field.name, value.upper())
+
+            if isinstance(field, models.CharField) and value:
+                setattr(
+                    self,
+                    field.name,
+                    value.upper()
+                )
+
+        self.full_clean()
+
         super().save(*args, **kwargs)
 
 class MembroEquipeUGAI(models.Model):
-    solicitacao_ref = models.ForeignKey(SolicitacaoUgais, on_delete=models.PROTECT, related_name='solicitacao')
+    solicitacao_ref = models.ForeignKey(
+        DadosSolicUgai,
+        on_delete=models.PROTECT,
+        related_name='membros'
+    )
     nome = models.CharField(max_length=80, blank=False, null=False)
-    email = models.CharField(max_length=150, blank=True, null=True)
+    email = models.EmailField(max_length=150, blank=True, null=True)
     telefone = models.CharField(max_length=11, blank=False, null=False)
     cor_raca = models.CharField(choices=RACA_CHOICES, blank=False, null=False, max_length=10)
     genero = models.CharField(choices=IDENTIDADE_GENERO_CHOICES, blank=False, null=False, max_length=12)
-    idade = models.IntegerField(blank=False, null=False)
+    data_nasc = models.DateField()
 
     def __str__(self):
         return f"{self.nome}"
@@ -196,21 +428,10 @@ class MembroEquipeUGAI(models.Model):
             models.Index(fields=["solicitacao_ref"]),
         ]
 
-def get_upload_path(_instance, filename):
-    ano = timezone.now().year
-    mes_num = timezone.now().month
-    meses = [
-        None,'janeiro','fevereiro','março','abril','maio','junho',
-        'julho','agosto','setembro','outubro','novembro','dezembro'
-    ]
-    mes = meses[mes_num]
-
-    return os.path.join('rel_final_pesq', str(ano), mes, filename)
-
 class ArquivosRelFinal(models.Model):
-    pesquisa = models.ForeignKey(
+    pesquisa_ref = models.ForeignKey(
         DadosSolicPesquisa, on_delete=models.CASCADE, related_name='arq_pesquisa')
-    documento = models.FileField(upload_to=get_upload_path)
+    documento = models.FileField(upload_to=get_path_rel)
     upado_em = models.DateTimeField(default=timezone.now)
 
     def delete_documento(self):
@@ -221,4 +442,4 @@ class ArquivosRelFinal(models.Model):
         self.delete()
 
     def __str__(self):
-        return f"{self.pesquisa.acao_realizada}"
+        return f"{self.pesquisa_ref.acao_realizada}"

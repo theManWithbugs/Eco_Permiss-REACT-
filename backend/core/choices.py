@@ -95,7 +95,7 @@ MUNICIPIOS_CHOICES = (
 )
 
 CHOICES_AREA_ATUACAO = (
-  ('NA', 'Selecione'),
+  # ('NA', 'Selecione'),
   ('FAUNA', 'Fauna'),
   ('FLORA', 'Flora'),
   ('ECOLOGIA', 'Ecologia'),
@@ -106,7 +106,7 @@ CHOICES_AREA_ATUACAO = (
   ('RECURSOS HIDRICOS', 'Recursos hidricos'),
   ('EDUCAÇÃO AMBIENTAL', 'Educação Ambiental'),
   ('CAVIDADES NATURAIS', 'Cavidades Naturais'),
-  ('OUTROS', 'Outros')
+  # ('OUTROS', 'Outros')
 )
 
 CHOICES_UGAIS = (

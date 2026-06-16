@@ -9,6 +9,7 @@ urlpatterns = [
     # JWT Auth
     path('api/login/', TokenObtainPairView.as_view(), name='login'),
     path('api/refresh/', TokenRefreshView.as_view(), name='refresh'),
+    path('api/dados_user/', get_user_data),
 
     # =====================
     # Rotas de Dados Gerais
@@ -19,6 +20,7 @@ urlpatterns = [
 
     # Membros da equipe de pesquisa
     path('api/membros_equip/', membros_pesq),
+    path('api/info_pesq/', info_pesquisa),
 
     # Solicitações de UGAI do usuário
     path('api/minhas_solic_ugai/', minhas_solic_ugai),
@@ -45,8 +47,6 @@ urlpatterns = [
     # Rotas de UGAI
     # =====================
 
-    # Ver todas as UGAIs cadastradas
-    path('api/see_ugai/', only_to_see),
     # Criar solicitação de UGAI
     path('api/solic_ugai/', solic_ugai),
 
@@ -55,7 +55,7 @@ urlpatterns = [
     # =====================
 
     # Upload de arquivos finais de pesquisa
-    path('api/file_upload/', FileUploadView.as_view()),
+    path('api/file_upload/', file_upload),
 ]
 
 # ATENÇÃO: Sempre que adicionar novas rotas, mantenha a organização por blocos temáticos.

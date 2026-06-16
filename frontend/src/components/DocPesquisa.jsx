@@ -9,10 +9,16 @@ import Swal from 'sweetalert2';
 
 function DocPesquisa({ id_pesquisa, status_obj }) {
   const [docs, setDocs] = useState([]);
+  const token = localStorage.getItem("access");
 
   // Função que dispara o submit automaticamente ao selecionar o arquivo
   const handleFileChange = async (event) => {
     const arquivoSelecionado = event.target.files[0]; // Captura o arquivo individual
+
+    if (!token) {
+      navigate('/login');
+      return;
+    }
 
     if (!arquivoSelecionado) return;
 
@@ -22,20 +28,23 @@ function DocPesquisa({ id_pesquisa, status_obj }) {
 
     try {
       const response = await fetch(`${API_URL}/api/file_upload/`, {
-        method: 'POST',
+        method: "POST",
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
         body: formData, // O próprio navegador configura o multipart/form-data automático
       });
 
       const dados = await response.json();
 
       if (response.ok) {
-        showToast(response.status, dados);
+        showToast(dados);
         getDocPesq(); // Atualiza a lista de documentos após o upload
       } else {
-        showToast(response.status, dados);
+        showToast(dados.status, dados);
       }
     } catch (error) {
-      showToast(response.status, error);
+      showToast(dados.status, dados);
     } finally {
       // Limpa o valor do input para permitir enviar o mesmo arquivo novamente se necessário
       event.target.value = '';
@@ -73,7 +82,7 @@ function DocPesquisa({ id_pesquisa, status_obj }) {
 
     } catch (error) {
       console.error("Erro ao buscar documentos:", error);
-      alert("Houve um erro ao processar sua requisição.");
+      alert(`${error}`);
     }
   }
 

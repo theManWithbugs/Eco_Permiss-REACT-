@@ -5,16 +5,16 @@
    ============================================ */
 
 :root {
-  --membro-primary: #185fa5;
-  --membro-secondary: #378add;
-  --membro-accent: #85b7eb;
-  --membro-light: #e6f1fb;
-  --membro-background: #f0f6fd;
-  --membro-text: #0c2d4a;
-  --membro-border: #b5d4f4;
-  --membro-shadow: rgba(24, 95, 165, 0.1);
-  --membro-error: #e74c3c;
-  --membro-success: #27ae60;
+  --membro-primary: #2f5f4f;
+  --membro-secondary: #7d5b42;
+  --membro-accent: #d9a84b;
+  --membro-light: #f2ece1;
+  --membro-background: #f8faf6;
+  --membro-text: #2e2a28;
+  --membro-border: #c7c0b4;
+  --membro-shadow: rgba(47, 95, 79, 0.12);
+  --membro-error: #d64545;
+  --membro-success: #4b8b5a;
   --membro-spacing: 1.5rem;
   --membro-radius: 8px;
   --membro-transition: 0.3s ease;

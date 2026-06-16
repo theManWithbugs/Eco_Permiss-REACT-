@@ -1,5 +1,8 @@
 from rest_framework import serializers
-from .models import DadosSolicPesquisa, MembroEquipe, SolicitacaoUgais
+from django.contrib.auth import get_user_model
+from .models import *
+
+User = get_user_model()
 
 # =========================
 # SERIALIZERS DE PESQUISA
@@ -32,6 +35,8 @@ class SerializerSolicPesq(serializers.ModelSerializer):
         exclude = [
             'user_solic',
             'data_solicitacao',
+            'unidades',
+            'area_atuacao',
             'gestor_resp',
             'recusa_motivo',
             'status'
@@ -59,7 +64,7 @@ class SerializerMembroEquipe(serializers.ModelSerializer):
     Serializa membros da equipe para criação.
     """
     class Meta:
-        model = MembroEquipe
+        model = MembroEquipePesq
         exclude = [
             'pesquisa',
         ]
@@ -69,7 +74,7 @@ class SerializerMembrosPesq(serializers.ModelSerializer):
     Serializa membros da equipe para listagem.
     """
     class Meta:
-        model = MembroEquipe
+        model = MembroEquipePesq
         fields = '__all__'
 
 
@@ -79,21 +84,41 @@ class SerializerMembrosPesq(serializers.ModelSerializer):
 
 class SerializerGetDataUgai(serializers.ModelSerializer):
     """
-    Serializa SolicitacaoUgais para listagem/detalhe.
+    Serializa DadosSolicUgai para listagem/detalhe.
     """
     class Meta:
-        model = SolicitacaoUgais
+        model = DadosSolicUgai
         fields = "__all__"
 
 class SeializerRegUGAI(serializers.ModelSerializer):
     """
-    Serializa e valida criação de SolicitacaoUgais.
+    Serializa e valida criação de DadosSolicUgai.
     """
     class Meta:
-        model = SolicitacaoUgais
+        model = DadosSolicUgai
         exclude = [
             'user_solic',
             'quantidade_pessoas',
             'recusa_motivo',
             'status',
         ]
+
+# =========================
+# SERIALIZERS DE USER
+# =========================
+
+class SerializerGetUser(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'first_name', 'last_name', 'email', 'username']
+
+
+# =========================
+# SERIALIZERS DE DOCUMENTOS
+# =========================
+
+class SerializerDoc(serializers.ModelSerializer):
+    class Meta:
+
+        model = ArquivosRelFinal
+        fields = "__all__"

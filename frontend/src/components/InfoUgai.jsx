@@ -44,22 +44,16 @@ function InfoUgai() {
           <div className="ugai-section mb-4">
             <h5 className="ugai-section-title">Identificação</h5>
             <div className="row g-4">
-              <div className="col-md-4">
+              <div className="col-md-6">
                 <div className="ugai-card ugai-card-green">
                   <label>UGAI</label>
                   <p>{obj.ugai_nome || obj.ugai || '-'}</p>
                 </div>
               </div>
-              <div className="col-md-4">
+              <div className="col-md-6">
                 <div className="ugai-card ugai-card-blue">
                   <label>Instituição</label>
                   <p>{obj.instituicao}</p>
-                </div>
-              </div>
-              <div className="col-md-4">
-                <div className="ugai-card ugai-card-orange">
-                  <label>Data de Início</label>
-                  <p>{obj.data_inicio || obj.data_solicitacao}</p>
                 </div>
               </div>
             </div>
@@ -67,22 +61,16 @@ function InfoUgai() {
           <div className="ugai-section mb-4">
             <h5 className="ugai-section-title">Período e Pessoas</h5>
             <div className="row g-4">
-              {/* <div className="col-md-4">
+              <div className="col-md-6">
                 <div className="ugai-card ugai-card-orange">
                   <label>Data de Início</label>
                   <p>{obj.data_inicio || obj.data_solicitacao}</p>
                 </div>
-              </div> */}
+              </div>
               <div className="col-md-6">
                 <div className="ugai-card ugai-card-orange">
                   <label>Data de Término</label>
                   <p>{obj.data_final}</p>
-                </div>
-              </div>
-              <div className="col-md-6">
-                <div className="ugai-card ugai-card-teal">
-                  <label>Quantidade de Pessoas</label>
-                  <p>{obj.quantidade_pessoas}</p>
                 </div>
               </div>
             </div>

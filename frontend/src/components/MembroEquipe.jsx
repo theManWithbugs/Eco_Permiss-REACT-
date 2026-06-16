@@ -13,23 +13,6 @@ function RenderFormset() {
   const location = useLocation();
 
   const state = location.state;
-
-  // Recupera id_pesquisa do state ou do localStorage
-  // const [idPesquisa, setIdPesquisa] = useState(() => {
-  //   // Tenta pegar do state
-  //   const state = location.state;
-  //   let id = null;
-  //   if (state) {
-  //     id = typeof state === 'object' && state.id_pesquisa ? state.id_pesquisa : state;
-  //     // Salva no localStorage para persistir
-  //     if (id) localStorage.setItem('id_pesquisa', id);
-  //   } else {
-  //     // Tenta pegar do localStorage
-  //     id = localStorage.getItem('id_pesquisa');
-  //   }
-  //   return id;
-  // });
-
   // Redireciona se não houver objeto
   useEffect(() => {
     if (!state) {
@@ -55,7 +38,8 @@ function RenderFormset() {
       cpf: '',
       ori_sexual: '',
       instituicao: '',
-      email: ''
+      email: '',
+      documentos: []
     }
   ]);
 
@@ -80,6 +64,16 @@ function RenderFormset() {
     }
   };
 
+  const handleDocumentosChange = (id, files) => {
+    const updateFormsets = formsets.map((form) => {
+      if (form.id === id) {
+        return { ...form, documentos: Array.from(files || []) };
+      }
+      return form;
+    });
+    setFormsets(updateFormsets);
+  };
+
   const enviarDados = async (e) => {
     e.preventDefault();
 
@@ -90,19 +84,25 @@ function RenderFormset() {
       return;
     }
 
-    const payload = {
-      formsets: formsets,
-      id_pesquisa: state.id
-    };
+    const formData = new FormData();
+    const membrosParaEnviar = formsets.map(({ id, documentos, ...rest }) => rest);
+
+    formData.append('formsets', JSON.stringify(membrosParaEnviar));
+    formData.append('id_pesquisa', state.id);
+
+    formsets.forEach((form, index) => {
+      (form.documentos || []).forEach((file) => {
+        formData.append(`membro_${index}`, file);
+      });
+    });
 
     try {
       const response = await fetch(`${API_URL}/api/membros_solic_pesq/`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify(payload)
+        body: formData
       });
 
       const data = await response.json();
@@ -116,7 +116,8 @@ function RenderFormset() {
           cpf: '',
           ori_sexual: '',
           instituicao: '',
-          email: ''
+          email: '',
+          documentos: []
         }]);
         setErrors([]);
         Swal.fire({
@@ -134,6 +135,7 @@ function RenderFormset() {
         if (data.detail) {
           messageToShow = data.detail;
         }
+        toast.error(data.detail);
         // Se for array, cada posição é o erro do membro
         if (Array.isArray(data)) {
           setErrors(data);
@@ -157,7 +159,8 @@ function RenderFormset() {
       cpf: '',
       ori_sexual: '',
       instituicao: '',
-      email: ''
+      email: '',
+      documentos: []
     };
     setFormsets([...formsets, novoForm]);
   };
@@ -286,6 +289,23 @@ function RenderFormset() {
                   />
                   {errors[index] && errors[index].email && (
                     <span className='membro-error-message'>{Array.isArray(errors[index].email) ? errors[index].email.join(' ') : errors[index].email}</span>
+                  )}
+                </div>
+              </div>
+
+              <div className='membro-field-group'>
+                <div className='membro-field' style={{ gridColumn: '1 / -1' }}>
+                  <label className='membro-label'>Documentos do membro</label>
+                  <input
+                    type='file'
+                    className='membro-input'
+                    multiple
+                    onChange={(e) => handleDocumentosChange(form.id, e.target.files)}
+                  />
+                  {form.documentos && form.documentos.length > 0 && (
+                    <small className='membro-error-message' style={{ color: '#0d6efd', marginTop: '0.35rem', display: 'block' }}>
+                      Arquivos selecionados: {form.documentos.map((file) => file.name).join(', ')}
+                    </small>
                   )}
                 </div>
               </div>

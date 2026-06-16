@@ -6,6 +6,7 @@ import MinhasSolicPesq from "../components/MinhasSolicPesq";
 import { useState } from 'react';
 import MinhasSolicUgai from '../components/MinhasSolicUgai';
 import "../styles/btn_secondary.css"
+import { ToastContainer } from 'react-toastify';
 
 function MinhasSolic() {
   const [component, setComponent] = useState("pesquisa");
@@ -17,6 +18,7 @@ function MinhasSolic() {
   return (
     <>
       <NavUser />
+      <ToastContainer />
       <div className="link-menu-container container">
         <nav className="link-menu">
           <a
