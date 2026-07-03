@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+import re
 from .models import *
 
 User = get_user_model()
@@ -69,14 +70,30 @@ class SerializerMembroEquipe(serializers.ModelSerializer):
             'pesquisa',
         ]
 
+class SerializerAnexosMembrPesq(serializers.ModelSerializer):
+    class Meta:
+        model = AnexoMembroEquipe
+        fields = [
+            'id',
+            'nome_original',
+            'upado_em',
+            'doc_ident',
+            'doc_cpf',
+            'doc_seg_vida',
+            'doc_cart_vacin',
+            'licenca',
+            'outros'
+        ]
+
 class SerializerMembrosPesq(serializers.ModelSerializer):
     """
     Serializa membros da equipe para listagem.
     """
+    anexos = SerializerAnexosMembrPesq(many=True, read_only=True)
+
     class Meta:
         model = MembroEquipePesq
         fields = '__all__'
-
 
 # =========================
 # SERIALIZERS DE UGAI
@@ -119,6 +136,124 @@ class SerializerGetUser(serializers.ModelSerializer):
 
 class SerializerDoc(serializers.ModelSerializer):
     class Meta:
-
         model = ArquivosRelFinal
         fields = "__all__"
+
+
+class SerializerDocMembro(serializers.ModelSerializer):
+    """
+    Serializa anexos de membros da equipe de pesquisa.
+    """
+    class Meta:
+        model = AnexoMembroEquipe
+        fields = [
+            'id',
+            'membro',
+            'nome_original',
+            'upado_em',
+            'doc_ident',
+            'doc_cpf',
+            'doc_seg_vida',
+            'doc_cart_vacin',
+            'licenca',
+            'outros',
+        ]
+
+class UserRegistrationSerializer(serializers.Serializer):
+    # Campos do User (username omitido pois geramos abaixo)
+    password = serializers.CharField(
+        write_only=True,
+        error_messages={"required": "O campo senha é obrigatório."}
+    )
+    email = serializers.EmailField(
+        error_messages={
+            "required": "O campo e-mail é obrigatório.",
+            "invalid": "Insira um formato de e-mail válido."
+        }
+    )
+    first_name = serializers.CharField(error_messages={"required": "O campo nome é obrigatório."})
+    last_name = serializers.CharField(error_messages={"required": "O campo sobrenome é obrigatório."})
+
+    # Campos do DadosPessoais (Batendo com as regras do seu Model)
+    ori_sexual = serializers.CharField(error_messages={"required": "O campo orientação sexual é obrigatório."})
+    estado = serializers.CharField(error_messages={"required": "O campo estado é obrigatório."})
+    municipio = serializers.CharField(error_messages={"required": "O campo município é obrigatório."})
+    bairro = serializers.CharField(error_messages={"required": "O campo bairro é obrigatório."})
+
+    # Alterado para IntegerField para validar se o frontend enviou um número válido
+    numero = serializers.IntegerField(error_messages={
+        "required": "O campo número é obrigatório.",
+        "invalid": "O número da residência deve conter apenas dígitos numéricos."
+    })
+
+    telefone = serializers.CharField(error_messages={"required": "O campo telefone é obrigatório."})
+    rg = serializers.CharField(error_messages={"required": "O campo RG é obrigatório."})
+    org_emiss = serializers.CharField(error_messages={"required": "O campo órgão emissor é obrigatório."})
+    cpf = serializers.CharField(error_messages={"required": "O campo CPF é obrigatório."})
+    profissao = serializers.CharField(error_messages={"required": "O campo profissão é obrigatório."})
+
+    # Opcionais (Com allow_blank para aceitar strings vazias do formulário)
+    cep = serializers.CharField(required=False, allow_blank=True, default='')
+    logradouro = serializers.CharField(required=False, allow_blank=True, default='')
+    telefone_fixo = serializers.CharField(required=False, allow_blank=True, default='')
+
+    # Validação de Duplicidade no Banco
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Este e-mail já está cadastrado.")
+        return value
+
+    def validate_rg(self, value):
+        if DadosPessoais.objects.filter(rg=value).exists():
+            raise serializers.ValidationError("Este RG já está cadastrado.")
+        return value
+
+    def validate_cpf(self, value):
+        if DadosPessoais.objects.filter(cpf=value).exists():
+            raise serializers.ValidationError("Este CPF já está cadastrado.")
+        return value
+
+    def create(self, validated_data):
+        # 1. Geração automatizada do username baseado em nome + sobrenome
+        first_name = validated_data['first_name'].strip().lower()
+        last_name = validated_data['last_name'].strip().lower()
+
+        first_name = re.sub(r'\s+', '', first_name)
+        last_name = re.sub(r'\s+', '', last_name)
+
+        username_base = f"{first_name}.{last_name}"
+        username = username_base
+
+        contador = 1
+        while User.objects.filter(username=username).exists():
+            username = f"{username_base}{contador}"
+            contador += 1
+
+        # 2. Criação do Usuário
+        user = User.objects.create_user(
+            username=username,
+            password=validated_data['password'],
+            email=validated_data['email'],
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name']
+        )
+
+        # 3. Criação dos Dados Pessoais vinculados
+        DadosPessoais.objects.create(
+            usuario=user,
+            ori_sexual=validated_data['ori_sexual'], # Mapeia para o seu campo do model
+            estado=validated_data['estado'],
+            municipio=validated_data['municipio'],
+            bairro=validated_data['bairro'],
+            numero=validated_data['numero'],
+            telefone=validated_data['telefone'],
+            rg=validated_data['rg'],
+            org_emiss=validated_data['org_emiss'], # Traduz o nome enviado pelo frontend
+            cpf=validated_data['cpf'],
+            profissao=validated_data['profissao'],
+            cep=validated_data.get('cep', ''),
+            logradouro=validated_data.get('logradouro', ''),
+            telefone_fixo=validated_data.get('telefone_fixo', '')
+        )
+
+        return user

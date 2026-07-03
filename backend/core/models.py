@@ -58,25 +58,22 @@ class User(AbstractUser):
 
 class DadosPessoais(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name='dados_pessoais')
-    sexo = models.CharField(choices=SEXO, blank=False, null=False, max_length=10)
+    ori_sexual = models.CharField(choices=SEXO, blank=False, max_length=12)
     estado = models.CharField(
-        choices=ESTADOS_BRASIL_CHOICES, blank=False, null=False, max_length=20)
-    municipio = models.CharField(max_length=80, blank=False, null=False)
-    logradouro = models.CharField(blank=False, null=False, max_length=30)
-    numero = models.IntegerField(blank=False, null=False)
-    bairro = models.CharField(max_length=80, blank=False, null=False)
+        choices=ESTADOS_BRASIL_CHOICES, blank=False, max_length=20)
+    municipio = models.CharField(max_length=80, blank=False)
+    logradouro = models.CharField(blank=True, max_length=30)
+    numero = models.IntegerField(blank=False)
+    bairro = models.CharField(max_length=80, blank=False)
     telefone = models.CharField(max_length=13)
-    rg = models.CharField(blank=False, null=False,
-                          max_length=20, verbose_name='RG', unique=True)
+    rg = models.CharField(blank=False, max_length=20, verbose_name='RG', unique=True)
     org_emiss = models.CharField(
-        blank=False, null=False, max_length=30, verbose_name='Orgão emissor(RG)')
-    cpf = models.CharField(blank=False, null=False, validators=[
+        blank=False, max_length=30, verbose_name='Orgão emissor(RG)')
+    cpf = models.CharField(blank=False, validators=[
                            validador_cpf], max_length=14, verbose_name='CPF', unique=True)
-    telefone_fixo = models.CharField(max_length=10, blank=True, null=True)
-    cep = models.CharField(blank=False, null=False,
-                           max_length=9, verbose_name='CEP')
-    profissao = models.CharField(blank=False, null=False,
-                              max_length=30, verbose_name='Profissão/Ocupação')
+    telefone_fixo = models.CharField(max_length=10, blank=True)
+    cep = models.CharField(blank=True, max_length=9, verbose_name='CEP')
+    profissao = models.CharField(blank=False, max_length=30, verbose_name='Profissão/Ocupação')
 
     def __str__(self):
         return self.usuario.get_full_name() or self.usuario.username
@@ -264,18 +261,17 @@ class AnexoMembroEquipe(models.Model):
         on_delete=models.CASCADE,
         related_name='anexos'
     )
-
     nome_original = models.CharField(max_length=255, blank=True, null=True)
     upado_em = models.DateTimeField(default=timezone.now)
-
-    doc_ident = models.FileField(upload_to=get_path_doc)
-    doc_cpf = models.FileField(upload_to=get_path_doc)
-    doc_seg_vida = models.FileField(upload_to=get_path_doc)
-    doc_cart_vacin = models.FileField(upload_to=get_path_doc)
+    doc_ident = models.FileField(upload_to=get_path_membro_doc, blank=False, null=False, validators=[validate_file_size])
+    doc_cpf = models.FileField(upload_to=get_path_membro_doc, blank=False, null=False, validators=[validate_file_size])
+    doc_seg_vida = models.FileField(upload_to=get_path_membro_doc, blank=False, null=False, validators=[validate_file_size])
+    doc_cart_vacin = models.FileField(upload_to=get_path_membro_doc, blank=True, null=True, validators=[validate_file_size])
+    licenca = models.FileField(upload_to=get_path_membro_doc, blank=True, null=True, validators=[validate_file_size])
+    outros = models.FileField(upload_to=get_path_membro_doc, blank=True, null=True, validators=[validate_file_size])
 
     def __str__(self):
-        return self.nome_original or self.documento.name
-
+        return self.nome_original or str(self.membro)
 
 class Ugai(models.Model):
     id = models.BigAutoField(primary_key=True)

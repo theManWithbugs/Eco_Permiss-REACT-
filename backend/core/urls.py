@@ -6,57 +6,60 @@ from .views import *
 # Rotas de Autenticação
 # =====================
 urlpatterns = [
-    # JWT Auth
+    # =====================
+    # JWT AUTH
+    # =====================
     path('api/login/', TokenObtainPairView.as_view(), name='login'),
     path('api/refresh/', TokenRefreshView.as_view(), name='refresh'),
+
+    # =====================
+    # REGISTRAR USUÁRIO PADRÃO
+    # =====================
+    path('api/reg_user/', reg_usuario),
+
+    # =====================
+    # PEGAR DADOS DO USUARIO
+    # =====================
     path('api/dados_user/', get_user_data),
 
     # =====================
-    # Rotas de Dados Gerais
+    # PEGAR CHOICES GLOBAIS
     # =====================
-
-    # Solicitações de pesquisa do usuário logado
-    path('api/solic_pesq_user/', solic_pesq_user),
-
-    # Membros da equipe de pesquisa
-    path('api/membros_equip/', membros_pesq),
-    path('api/info_pesq/', info_pesquisa),
-
-    # Solicitações de UGAI do usuário
-    path('api/minhas_solic_ugai/', minhas_solic_ugai),
-
-    # Choices para selects do frontend
     path('api/get_choices/', get_choices),
 
-    # Documentos relacionados à pesquisa
-    path('api/get_doc/', get_url_doc),
-
-    # Excluir arquivo/documento
-    path('api/excluir_arq/', excluir_arq),
+    # =====================
+    # SOLICITAÇÕES DE PESQUISA
+    # =====================
+    path('api/solic_pesq_user/', solic_pesq_user),
+    path('api/minhas_solic_ugai/', minhas_solic_ugai),
 
     # =====================
-    # Rotas Principais de Pesquisa
+    # CRIAR SOLIC_PESQ
     # =====================
-
-    # Criar solicitação de pesquisa
     path('api/solic_pesquisa/', solic_pesquisa),
-    # Adicionar membros à solicitação de pesquisa
-    path('api/membros_solic_pesq/', membros_solic_pesq),
 
     # =====================
-    # Rotas de UGAI
+    # ROTAS DE UGAI
     # =====================
-
     # Criar solicitação de UGAI
     path('api/solic_ugai/', solic_ugai),
 
-    # =====================
-    # Upload de Arquivos
-    # =====================
-
+    # =========================
+    # INFORMAÇÕES DE PESQUISA
+    # =========================
+    path('api/info_pesq/', info_pesquisa),
+    path('api/membros_equip/', membros_pesq),
+    #Infomações dos membros inclusos na pesquisa
+    path('api/info_memb_pesq/', info_membro_pesq),
+    # Adicionar membros à solicitação de pesquisa
+    path('api/membros_solic_pesq/', membros_solic_pesq),
     # Upload de arquivos finais de pesquisa
     path('api/file_upload/', file_upload),
+    # Altera dados e arquivos do membro incluso
+    path('api/change_file_solic/', alterar_files_solic),
+    path('api/alt_dados_memb/', alt_doc_memb_pesq),
+    # Documentos relacionados à pesquisa
+    path('api/get_doc/', get_url_doc),
+    # Excluir arquivo/documento
+    path('api/excluir_arq/', excluir_arq),
 ]
-
-# ATENÇÃO: Sempre que adicionar novas rotas, mantenha a organização por blocos temáticos.
-# Certifique-se de que as views estejam protegidas por autenticação quando necessário.

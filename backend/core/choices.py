@@ -37,6 +37,14 @@ IDENTIDADE_GENERO_CHOICES = (
   ("outros", "Outros"),
 )
 
+ORIENTACOES_CHOICES = [
+  ("Heterossexual", "HETEROSEXUAL"),
+  ("Homossexual", "HOMOSEXUAL"),
+  ("Bissexual", "BISSEXUAL"),
+  ("Assexual", "ASSEXUAL"),
+  ("Pansexual", "PANSEXUAL")
+]
+
 ESTADOS_BRASIL_CHOICES = (
   ('NA', 'Selecione'),
   ('AC', 'Acre'),

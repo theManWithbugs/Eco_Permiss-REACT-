@@ -1,13 +1,19 @@
 from datetime import timedelta
 from pathlib import Path
+from decouple import config, Csv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-2%^pm_^i9r0m85)ws&*-6@95ip0r=6lydnq$r2km*2*%bbj$la'
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
-DEBUG = True
+SECRET_KEY = config('SECRET_KEY')
 
-ALLOWED_HOSTS = ["*"]
+DEBUG = config('DEBUG', cast=bool)
+
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default=[], cast=Csv())
+
+# Precisa ser a versão mais antiga do REDIS para funcionar
+# pip install "redis<5.0.0"
 
 # ========================
 # APPS
@@ -22,7 +28,6 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'corsheaders',
-
     'core'
 ]
 
@@ -43,9 +48,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'setup.urls'
 
-# ========================
-# 🔥 CORREÇÃO DO ERRO ADMIN
-# ========================
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -99,6 +101,7 @@ LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Rio_Branco'
 USE_I18N = True
 USE_TZ = True
+
 # ========================
 # STATIC
 # ========================
@@ -128,3 +131,29 @@ SIMPLE_JWT = {
 # USER CUSTOM
 # ========================
 AUTH_USER_MODEL = 'core.User'
+
+# ========================
+# EMAIL CONFIGURATIONS
+# ========================
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
+SERVER_EMAIL = config('DEFAULT_FROM_EMAIL')
+
+# ========================
+# CELERY CONFIGURATIONS
+# ========================
+CELERY_BROKER_URL = config('CELERY_BROKER_URL', default='redis://127.0.0.1:6379/0')
+CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', default='redis://127.0.0.1:6379/0')
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = 'America/Rio_Branco'
+CELERY_TASK_ACKS_LATE = True
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
+CELERY_WORKER_POOL = 'solo'
+CELERY_WORKER_CONCURRENCY = 1
