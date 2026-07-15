@@ -69,7 +69,11 @@ function MinhasSolicUgai() {
         <br />
         {dados.map((item) => (
           <div className='card_items' key={ item.id }>
-            <h5 className='text-uppercase'>{ item.ativ_desenv }</h5>
+            <h5 className='text-uppercase'>
+              {item.ativ_desenv?.length > 60
+                ? item.ativ_desenv.slice(0, 60) + '...'
+                : item.ativ_desenv}
+            </h5>
             <div>
               <span>Status: <span style={{ color: item.status === 'APROVADO' ? '#16a34a' : item.status === 'PENDENTE' ? '#78909c' : item.status === 'INDEFERIDO' ? '#dc2626' : '#1565c0', fontWeight: 600 }}>{ item.status }</span></span>
             </div>

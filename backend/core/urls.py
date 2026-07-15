@@ -18,6 +18,18 @@ urlpatterns = [
     path('api/reg_user/', reg_usuario),
 
     # =====================
+    # RECUPERAR CREDENCIAIS
+    # =====================
+    path('api/recup_credenc/', recup_credenc),
+    path('api/validar_codigo_recup/', validar_codigo_recup),
+    path('api/red_senha/', redefinir_senha),
+
+    # =====================
+    # ALTERAR DADOS DO USUARIO
+    # =====================
+    path('api/alt_dados_user/', alterar_dados_user),
+
+    # =====================
     # PEGAR DADOS DO USUARIO
     # =====================
     path('api/dados_user/', get_user_data),

@@ -16,7 +16,9 @@
     "react-dom": "^19.2.5",
     "react-router-dom": "^7.14.2",
     "react-toastify": "^11.1.0",
-    "sweetalert2": "^11.26.24"
+    "styled-components": "^6.4.2",
+    "sweetalert2": "^11.26.24",
+    "vite-plugin-svgr": "^5.2.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

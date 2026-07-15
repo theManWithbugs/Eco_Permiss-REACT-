@@ -49,14 +49,20 @@ export const getUserData = async (token) => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
-
-    console.log(data);
+    console.log(data.dados_pessoais);
 
     return data;
   } catch (error) {
     showToast(500, `Ocorreu um erro: ${error.message}`);
     return null;
   }
+}
+
+export function formatar_username(first_name, last_name) {
+    const first_name_frmt = first_name.toLowerCase();
+    const last_name_fmrt = last_name.toLowerCase();
+    const username = `${first_name_frmt}.${last_name_fmrt}`;
+    return username;
 }
 
 export default API_URL;

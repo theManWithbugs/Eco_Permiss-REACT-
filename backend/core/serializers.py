@@ -107,7 +107,7 @@ class SerializerGetDataUgai(serializers.ModelSerializer):
         model = DadosSolicUgai
         fields = "__all__"
 
-class SeializerRegUGAI(serializers.ModelSerializer):
+class SerializerRegUGAI(serializers.ModelSerializer):
     """
     Serializa e valida criação de DadosSolicUgai.
     """
@@ -129,6 +129,11 @@ class SerializerGetUser(serializers.ModelSerializer):
         model = User
         fields = ['id', 'first_name', 'last_name', 'email', 'username']
 
+class SerializerDadosPss(serializers.ModelSerializer):
+    class Meta:
+        model = DadosPessoais
+        fields = ['rg', 'cpf', 'ori_sexual', 'estado', 'municipio', 'cep', 'org_emiss',
+                  'bairro', 'logradouro', 'numero', 'telefone', 'telefone_fixo', 'profissao']
 
 # =========================
 # SERIALIZERS DE DOCUMENTOS
@@ -255,5 +260,78 @@ class UserRegistrationSerializer(serializers.Serializer):
             logradouro=validated_data.get('logradouro', ''),
             telefone_fixo=validated_data.get('telefone_fixo', '')
         )
+
+        return user
+
+class AlterarDadosPss(serializers.Serializer):
+    email = serializers.EmailField(
+        error_messages={
+            "required": "O campo e-mail é obrigatório.",
+            "invalid": "Insira um formato de e-mail válido."
+        }
+    )
+    first_name = serializers.CharField(error_messages={"required": "O campo nome é obrigatório."})
+    last_name = serializers.CharField(error_messages={"required": "O campo sobrenome é obrigatório."})
+
+    ori_sexual = serializers.CharField(error_messages={"required": "O campo orientação sexual é obrigatório."})
+    estado = serializers.CharField(error_messages={"required": "O campo estado é obrigatório."})
+    municipio = serializers.CharField(error_messages={"required": "O campo município é obrigatório."})
+    bairro = serializers.CharField(error_messages={"required": "O campo bairro é obrigatório."})
+
+    numero = serializers.IntegerField(error_messages={
+        "required": "O campo número é obrigatório.",
+        "invalid": "O número da residência deve conter apenas dígitos numéricos."
+    })
+
+    telefone = serializers.CharField(error_messages={"required": "O campo telefone é obrigatório."})
+    rg = serializers.CharField(error_messages={"required": "O campo RG é obrigatório."})
+    org_emiss = serializers.CharField(error_messages={"required": "O campo órgão emissor é obrigatório."})
+    cpf = serializers.CharField(error_messages={"required": "O campo CPF é obrigatório."})
+    profissao = serializers.CharField(error_messages={"required": "O campo profissão é obrigatório."})
+
+    cep = serializers.CharField(required=False, allow_blank=True, default='')
+    logradouro = serializers.CharField(required=False, allow_blank=True, default='')
+    telefone_fixo = serializers.CharField(required=False, allow_blank=True, default='')
+
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exclude(pk=self.instance.pk).exists():
+            raise serializers.ValidationError("Este e-mail já está cadastrado.")
+        return value
+
+    def validate_rg(self, value):
+        if DadosPessoais.objects.filter(rg=value).exclude(usuario=self.instance).exists():
+            raise serializers.ValidationError("Este RG já está cadastrado.")
+        return value
+
+    def validate_cpf(self, value):
+        if DadosPessoais.objects.filter(cpf=value).exclude(usuario=self.instance).exists():
+            raise serializers.ValidationError("Este CPF já está cadastrado.")
+        return value
+
+    def update(self, instance, validated_data):
+        user = instance
+        user.email = validated_data.get('email', user.email)
+        user.first_name = validated_data.get('first_name', user.first_name)
+        user.last_name = validated_data.get('last_name', user.last_name)
+        user.save()
+
+        dados_pessoais = self.context.get('dados_pessoais')
+        if dados_pessoais is None:
+            dados_pessoais = get_object_or_404(DadosPessoais, usuario=user)
+
+        dados_pessoais.ori_sexual = validated_data.get('ori_sexual', dados_pessoais.ori_sexual)
+        dados_pessoais.estado = validated_data.get('estado', dados_pessoais.estado)
+        dados_pessoais.municipio = validated_data.get('municipio', dados_pessoais.municipio)
+        dados_pessoais.bairro = validated_data.get('bairro', dados_pessoais.bairro)
+        dados_pessoais.numero = validated_data.get('numero', dados_pessoais.numero)
+        dados_pessoais.telefone = validated_data.get('telefone', dados_pessoais.telefone)
+        dados_pessoais.rg = validated_data.get('rg', dados_pessoais.rg)
+        dados_pessoais.org_emiss = validated_data.get('org_emiss', dados_pessoais.org_emiss)
+        dados_pessoais.cpf = validated_data.get('cpf', dados_pessoais.cpf)
+        dados_pessoais.profissao = validated_data.get('profissao', dados_pessoais.profissao)
+        dados_pessoais.cep = validated_data.get('cep', dados_pessoais.cep)
+        dados_pessoais.logradouro = validated_data.get('logradouro', dados_pessoais.logradouro)
+        dados_pessoais.telefone_fixo = validated_data.get('telefone_fixo', dados_pessoais.telefone_fixo)
+        dados_pessoais.save()
 
         return user

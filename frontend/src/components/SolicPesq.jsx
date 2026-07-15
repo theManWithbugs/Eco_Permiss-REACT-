@@ -31,6 +31,7 @@ function SolicPesquisa() {
   const [choicesUCS, setChoicesUCS] = useState([]);
   const [choicesArea, setChoicesArea] = useState([]);
 
+  const [checkAceiteTermos, setCheckAceiteTermos] = useState(false);
   const [checkAceite, setCheckAceite] = useState(false);
   const [documentos, setDocumentos] = useState({
     doc_ident: [],
@@ -41,7 +42,7 @@ function SolicPesquisa() {
   });
 
   const tiposDocumentos = [
-    { key: 'doc_ident', label: 'Documento de Identidade', multiplo: false },
+    { key: 'doc_ident', label: 'Documento de Identidade(RG/CNH)', multiplo: false },
     { key: 'doc_cpf', label: 'CPF', multiplo: false },
     { key: 'doc_seg_vida', label: 'Seguro de Vida', multiplo: false },
     { key: 'outros', label: 'Outros', multiplo: true }
@@ -55,8 +56,9 @@ function SolicPesquisa() {
   )
 
   // const [dadosUser, setDadosUser] = useState([]);
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [rg, setRG] = useState("");
 
   const limparDoc = (doc_name, event) => {
     // 1. Limpa o estado do React dinamicamente baseado na string enviada
@@ -77,7 +79,6 @@ function SolicPesquisa() {
         ? prev.filter((item) => item !== value)
         : [...prev, value]
     );
-    console.log(unidade);
   };
 
   const handleCheckboxChangeArea = (value) => {
@@ -98,6 +99,12 @@ function SolicPesquisa() {
     }
 
     if (checkAceite === false) {
+      toast.warning("Faz se necessario o aceite dos termos!");
+      setLoading(false);
+      return;
+    }
+
+    if (checkAceiteTermos === false) {
       toast.warning("Faz se necessario o aceite dos termos!");
       setLoading(false);
       return;
@@ -194,12 +201,13 @@ function SolicPesquisa() {
 
     if (arquivosSelecionados.length === 0) return;
 
-    // Correção do seu IF comentado: Verifica se ALGUÉM na lista passa de 5MB
+    // Verifica se ALGUÉM na lista passa de 5MB
+    // O comando some() verifica se algum item na lista é igual a condição
     const possuiArquivoMuitoGrande = arquivosSelecionados.some(arquivo => arquivo.size > maxSizeBytes);
 
     if (possuiArquivoMuitoGrande) {
       toast.warning("Um ou mais arquivos são muito grandes. O tamanho máximo permitido é 5MB por arquivo.");
-      event.target.value = ''; // Limpa o input
+      event.target.value = ''; // Limpa o input, apenas do elemento selecionado
       return;
     }
 
@@ -248,8 +256,8 @@ function SolicPesquisa() {
         setChoicesUCS(choicesUCS_);
         setChoicesArea(choicesArea_);
 
-      } catch (erro) {
-        console.error("Erro ao buscar dados:", erro);
+      } catch (error) {
+        toast.error("Não foi possível obter as opções disponíveis!");
       }
     };
     carregar_unidades();
@@ -259,8 +267,9 @@ function SolicPesquisa() {
         const userData = await getUserData(token);
         if (userData) {
           // setDadosUser(userData);
-          setFirstName(userData.first_name);
-          setLastName(userData.last_name);
+          setFirstName(userData.user.first_name);
+          setLastName(userData.user.last_name);
+          setRG(userData.dados_pessoais.rg);
         }
       } catch (erro) {
         console.error("Erro ao buscar dados:", erro);
@@ -286,7 +295,61 @@ function SolicPesquisa() {
         <div className='container p-3'>
           <h5 className='solic-section-title'>Regulamento de pesquisa</h5>
           <div className='row'>
-            <div className="col-md-6">
+            <div className='col-md-12'>
+              <div className="card document-card h-100 shadow-sm border-0">
+                <div className="card-body" style={{ "fontFamily": "Georgia, serif" }}>
+                  <h5 className="card-title text-warning">Termo de compromisso do solitante</h5>
+                  {/* {dadosUser && dadosUser.length > 0 ? (
+                    <div>
+                      <p><strong>Nome:</strong> {dadosUser[0]?.first_name}</p>
+                      <p><strong>Sobrenome:</strong> {dadosUser[0]?.last_name}</p>
+                    </div>
+                  ) : (
+                    <p className="text-muted">Carregando dados...</p>
+                  )} */}
+                  <p>Eu <strong>{ firstName } { lastName }</strong>,
+                  portador do RG n° <strong>{ rg } </strong>
+                  pesquisador responsável pela execução do projeto a ser realizado na unidade de conservação assumo o com
+                  promisso junto a Divisão de Áreas Naturais Protegidas e Biodiversidade/Secretaria de Estado do Meio Ambiente
+                  de cumprir as obrigações abaixo listadas:</p>
+                  <p>
+                    <strong>1.</strong> Repassar informações à DAPBio/SEMAPI sobre o referido projeto de minha responsabilidade, na forma de tese, dissertação, monografia, artigo,
+                    relatório parcial, relatório final, registro fotográfico, entre outros, conforme compromisso assumido no ato da solicitação, sob pena das sanções
+                    previstas em lei;
+                  </p>
+                  <p>
+                    <strong>2.</strong> Entregar à DAPBio/SEMAPI os relatórios parciais e o relatório final, contendo os resultados da pesquisa, em meio impresso e digital, no prazo
+                    de 60 (sessenta) dias após conclusão do projeto;
+                  </p>
+                  <p>
+                    <strong>3.</strong> Encaminhar à DAPBio/SEMAPI a declaração do responsável pela coleção científica na qual foi depositado o material coletado durante a pesquisa.
+                    Assumo a responsabilidade solidária entre os pesquisadores que compõem essa equipe e a instituição a que o referido projeto está vinculado sobre
+                    eventuais danos causados à Unidade de Conservação.
+                    Estou ciente de que o não cumprimento das obrigações constantes na Instrução Normativa que regulamenta a pesquisa no Estado do Acre e nos
+                    demais instrumentos legais que regulamentam a matéria suspende a autorização de outros projetos em Unidades de Conservação estaduais solicitadas por mim ou pela instituição da qual estou vinculado.
+                    Estou ciente de que, em caso de descumprimento das obrigações constantes nesse termo de compromisso, a instituição à qual estou vinculado fica
+                    obrigada a cumprir as obrigações firmadas
+                  </p>
+
+                    <div className="form-check ms-4 mb-2">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        id="flexCheckDefault"
+                        checked={checkAceiteTermos}
+                        onChange={e => setCheckAceiteTermos(e.target.checked)}
+                      />
+                      <label className="form-check-label" htmlFor="flexCheckDefault">
+                        Confirmo que li e concordo com os termos
+                      </label>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+            <br />
+          <div className='row'>
+            <div className="col-md-12">
               <div className="card document-card h-100 shadow-sm border-0">
                 <div className="card-body d-flex flex-column">
                   <div className="text-center mb-3">
@@ -312,28 +375,12 @@ function SolicPesquisa() {
                     onChange={e => setCheckAceite(e.target.checked)}
                   />
                   <label className="form-check-label" htmlFor="flexCheckDefault">
-                    Confirmo que li e concordo com os termos
+                    Confirmo que li e concordo
                   </label>
                 </div>
               </div>
             </div>
-            <div className='col-md-6'>
-              <div className="card document-card h-100 shadow-sm border-0">
-                <div className="card-body">
-                  <h5 className="card-title">Termo de compromisso do solitante</h5>
-                  {/* {dadosUser && dadosUser.length > 0 ? (
-                    <div>
-                      <p><strong>Nome:</strong> {dadosUser[0]?.first_name}</p>
-                      <p><strong>Sobrenome:</strong> {dadosUser[0]?.last_name}</p>
-                    </div>
-                  ) : (
-                    <p className="text-muted">Carregando dados...</p>
-                  )} */}
-                  <p>Eu <strong>{ firstName } { lastName }</strong>, portador do RG n°<strong></strong></p>
-                </div>
-              </div>
-            </div>
-          </div>
+           </div>
         </div>
 
         <form onSubmit={handleSubmit} className='solic-form'>
@@ -365,7 +412,6 @@ function SolicPesquisa() {
                       {documentos[key].map((arquivo, index) => (
                         <span key={`${arquivo.name}-${index}`} className='solic-upload-item'>
                           <span>{arquivo.name}</span>
-                          <span>{ key }, { index }</span>
                           <button
                             type='button'
                             className='solic-upload-remove'
@@ -475,7 +521,7 @@ function SolicPesquisa() {
                 <p className='solic-upload-info-title'>Orientações</p>
                 <ul>
                   <li>Envie arquivos em PDF</li>
-                  <li>Documento de indentidade, seguro de vida e CPF são obrigatorios!</li>
+                  <li><span className='text-danger fw-bold'>Documento de indentidade, seguro de vida e CPF são obrigatorios!</span></li>
                   <li>Para Documento de Identidade, CPF e Seguro de Vida, envie um arquivo por categoria.</li>
                   <li>Para Licença e Outros, você pode enviar múltiplos arquivos.</li>
                   <li>O nome do arquivo deve ser claro e objetivo.</li>
@@ -568,17 +614,6 @@ function SolicPesquisa() {
           <div className='solic-section'>
             <h2 className='solic-section-title'>Descrição</h2>
             <div className='solic-grid-2'>
-              {/* <div className='solic-field'>
-                <label className='solic-label'>Número de Licença</label>
-                <input
-                  className='solic-input'
-                  placeholder='Ex: IBAMA 2024/001'
-                  value={licenca}
-                  maxLength={120}
-                  onChange={(e) => setLicenca(e.target.value)}
-                />
-              </div> */}
-
               <div className='solic-field'>
                 <label className='solic-label'>Benefícios Gerados <IconAlert /></label>
                 <input

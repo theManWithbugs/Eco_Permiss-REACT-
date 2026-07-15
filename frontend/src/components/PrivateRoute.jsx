@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { checkAuth } from "../auth/auth";
+import { checkAuth } from "../auth/components/auth";
 
 function PrivateRoute({ children }) {
   const [loading, setLoading] = useState(true);

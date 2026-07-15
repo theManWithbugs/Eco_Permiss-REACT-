@@ -6,19 +6,23 @@ from django.core.paginator import Paginator
 from django.forms import model_to_dict
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from django.db import transaction
+from django.contrib.auth.models import User
 
 from rest_framework import serializers, status
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+import http
+from django.http import JsonResponse
 
 from .choices import *
 from .models import *
 from .serializers import *
-from .utils import enviar_username, recup_creden
+from .utils import enviar_codigo_recuperacao, enviar_username
 
+from django.views.decorators.csrf import csrf_exempt
+import random
 
 # =========================
 # Variáveis de status HTTP
@@ -109,6 +113,102 @@ def reg_usuario(request):
 #----------------------------------------------------------------------------------------#
 
 
+# =========================
+# RECUPERAR CREDÊNCIAIS
+# =========================
+#----------------------------------------------------------------------------------------#
+#----------------------------------------------------------------------------------------#
+@csrf_exempt
+@api_view(['POST'])
+def recup_credenc(request):
+    email = request.data.get('email')
+
+    def gerar_codigo():
+        return random.randint(1000, 9999)
+
+    try:
+        user = get_object_or_404(User, email=email)
+        dados_user = get_object_or_404(DadosPessoais, usuario=user)
+        codigo = gerar_codigo()
+
+        dados_user.codigo_recup = codigo
+        dados_user.save()
+        enviar_codigo_recuperacao(user.email, user.username, codigo)
+        return Response({"message": "Código enviado por e-mail!"},
+                        status=200)
+    except Exception as e:
+        return Response({"message": "Usuario não localizado!"}, status=400)
+
+
+@csrf_exempt
+@api_view(['POST'])
+def validar_codigo_recup(request):
+    email = request.data.get('email')
+    codigo = request.data.get('codigo')
+
+    try:
+        user = get_object_or_404(User, email=email)
+        dados_user = get_object_or_404(DadosPessoais, usuario=user)
+
+        if int(dados_user.codigo_recup) != int(codigo):
+            return JsonResponse({"message": "Código inválido!"}, status=http.HTTPStatus.BAD_REQUEST)
+
+        return JsonResponse({"id": str(user.id)}, status=http.HTTPStatus.OK)
+    except Exception:
+        return JsonResponse({"message": "Usuário não localizado!"}, status=http.HTTPStatus.BAD_REQUEST)
+
+@csrf_exempt
+@api_view(['POST'])
+def redefinir_senha(request):
+    user_id = request.data.get('id_user')
+    new_password = request.data.get('new_password')
+    if not user_id:
+        return Response({"message": "id_user não fornecido."}, status=400)
+
+    if not new_password:
+        return Response({"message": "new_password não fornecido."}, status=400)
+
+    user = get_object_or_404(User, id=user_id)
+
+    try:
+        user.set_password(new_password)
+        user.save()
+        return Response({"message": "Senha alterada com sucesso!"}, status=200)
+    except Exception as e:
+        return Response({"message": f"Não foi possível alterar suas credenciais! {e}"}, status=500)
+
+#----------------------------------------------------------------------------------------#
+#----------------------------------------------------------------------------------------#
+
+# =========================
+# ALTERAR DADOS DO USUARIO
+# =========================
+#----------------------------------------------------------------------------------------#
+#----------------------------------------------------------------------------------------#
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def alterar_dados_user(request):
+    user = request.user
+    dados_pss = get_object_or_404(DadosPessoais, usuario=user)
+
+    serializer = AlterarDadosPss(
+        instance=user,
+        data=request.data,
+        context={'dados_pessoais': dados_pss}
+    )
+
+    if serializer.is_valid():
+        try:
+            serializer.save()
+            return Response({"message": "Dados alterados com sucesso!"}, status=200)
+        except Exception as e:
+            return Response({"message": f"{e}"}, status=500)
+
+    return Response(serializer.errors, status=500)
+
+#----------------------------------------------------------------------------------------#
+#----------------------------------------------------------------------------------------#
+
 #----------------------------------------------------------------------------------------#
 #----------------------------------------------------------------------------------------#
 
@@ -121,10 +221,23 @@ def get_user_data(request):
 
     try:
         user = request.user
+        dados_pss = get_object_or_404(DadosPessoais, usuario=user)
+
         serializer = SerializerGetUser(user)
-        return JsonResponse(data=serializer.data, status=200)
+        serializer_pss = SerializerDadosPss(dados_pss)
+
+        return JsonResponse(
+            data={
+                "user": serializer.data,
+                "dados_pessoais": serializer_pss.data,
+            },
+            status=200,
+        )
     except Exception as e:
-        return JsonResponse("Ocorreu um erro: {}".format(e), status=500)
+        return JsonResponse(
+            {"message": "Ocorreu um erro: {}".format(e)},
+            status=500,
+        )
 
 
 @api_view(['GET'])
@@ -356,7 +469,7 @@ def solic_ugai(request):
     Cria uma solicitação de UGAI.
     Atenção: alguns campos são preenchidos automaticamente.
     """
-    serializer = SeializerRegUGAI(data=request.data)
+    serializer = SerializerRegUGAI(data=request.data)
     if serializer.is_valid():
         serializer.save(
             user_solic=request.user,

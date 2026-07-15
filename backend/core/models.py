@@ -74,6 +74,7 @@ class DadosPessoais(models.Model):
     telefone_fixo = models.CharField(max_length=10, blank=True)
     cep = models.CharField(blank=True, max_length=9, verbose_name='CEP')
     profissao = models.CharField(blank=False, max_length=30, verbose_name='Profissão/Ocupação')
+    codigo_recup = models.IntegerField()
 
     def __str__(self):
         return self.usuario.get_full_name() or self.usuario.username

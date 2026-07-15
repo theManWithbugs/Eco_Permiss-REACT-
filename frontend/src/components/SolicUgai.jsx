@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import API_URL from "../constants/global.js";
 import buscarChoicesDoBanco from '../constants/choices';
 import '../styles/solic_pesq.css';
+import Swal from 'sweetalert2';
+import MapaAcre from './MapaAcre.jsx';
 
 function SolicUgai() {
   const navigate = useNavigate();
@@ -61,8 +63,19 @@ function SolicUgai() {
         return;
       }
 
+      Swal.fire({
+        title: "Solicitação realizada!",
+        text: "Sua solicitação foi realizada com sucesso! Você pode acompanhá-la em 'Solicitações de UGAI'.",
+        position: "top",
+        icon: "success",
+        draggable: true
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate('/minhas_solic');
+        }
+      });
       setErrors({});
-      navigate('/minhas_solic');
+
     } catch (erro) {
       console.error("Erro ao enviar solicitação:", erro);
       setLoading(false);
@@ -105,6 +118,8 @@ function SolicUgai() {
           <div className='solic-accent-shape'></div>
         </div>
 
+        <MapaAcre />
+
         <form onSubmit={handleSubmit} className='solic-form'>
           <div className='solic-section'>
             <h2 className='solic-section-title'>Dados da Unidade</h2>
@@ -118,7 +133,7 @@ function SolicUgai() {
                 >
                   <option value=''>Selecione a UGAI</option>
                   {choicesUgaisDict.map((item) => (
-                    <option value={item.value}>{ item.label }</option>
+                    <option value={item.value} key={item.value}>{ item.label }</option>
                   ))}
 
                 </select>

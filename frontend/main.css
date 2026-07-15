@@ -1,0 +1,25 @@
+:root {
+  --header-height: 140px;
+}
+
+html, body, h1, h2, h3, h4, h5, h6, p, li, ol, ul, pre {
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  min-height: 100%;
+}
+
+body {
+  height: 100vh;
+  background: linear-gradient(135deg, #2f7d4a 0%, #a3b899 50%, #f4f6f4 100%);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  background-attachment: fixed;
+  padding: 0 20px;
+  padding-top: var(--header-height);
+  box-sizing: border-box;
+  margin-bottom: 80px;
+}

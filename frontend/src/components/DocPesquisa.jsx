@@ -63,6 +63,7 @@ function DocPesquisa({ id_pesquisa, status_obj }) {
       id_pesq: id_pesquisa
     }
 
+
     try {
       const response = await fetch(`${API_URL}/api/get_doc/`, {
         method: "POST",
@@ -166,6 +167,8 @@ function DocPesquisa({ id_pesquisa, status_obj }) {
 
   return (
     <>
+    <hr />
+      <h5>Anexar relatórios da pesquisa</h5>
       <br />
         <form id="fileUploadForm" className="file-upload-form">
           <label htmlFor="file" className="file-upload-label">
@@ -185,50 +188,51 @@ function DocPesquisa({ id_pesquisa, status_obj }) {
             />
           </label>
         </form>
-         <br />
-        <div className="cards-row">
-          {docs.map((doc, index) => (
-            <div className="col-auto" key={index}>
-              {/* <a href={doc.documento} target="_blank"></a> */}
-              <div className="card document-card h-100 shadow-sm border-0">
-                <div className="card-body d-flex flex-column">
-                  <div className="text-center mb-3">
-                    <img src={ImgPDF} alt="" width="85px" />
-                  </div>
+        {/* <div className='p-4'> */}
+          <div className="row">
+            {docs.map((doc, index) => (
+              <div className="col-md-3 bg-light p-4 mt-3" key={index}>
+                {/* <a href={doc.documento} target="_blank"></a> */}
+                <div className="card document-card h-100 border-0">
+                  <div className="card-body d-flex flex-column">
+                    <div className="text-center mb-3">
+                      <img src={ImgPDF} alt="" width="85px" />
+                    </div>
 
-                  <h6 className="card-title text-truncate" title={ doc.documento }>
-                    { formtNomeDoc(doc.documento) }
-                  </h6>
+                    <h6 className="card-title text-truncate" title={ doc.documento }>
+                      { formtNomeDoc(doc.documento) }
+                    </h6>
 
-                  <small className="text-muted mb-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" className="bi bi-calendar me-1" viewBox="0 0 16 16">
-                      <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
-                    </svg>
-                    { formtDate(doc.upado_em) }
-                  </small>
-
-                  <div className="mt-auto">
-                    <a href={doc.documento} target="_blank" className="btn btn-sm btn-primary w-100">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-eye-fill me-1" viewBox="0 0 16 16">
-                        <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
-                        <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
+                    <small className="text-muted mb-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" className="bi bi-calendar me-1" viewBox="0 0 16 16">
+                        <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
                       </svg>
-                      Visualizar
-                    </a>
+                      { formtDate(doc.upado_em) }
+                    </small>
 
-                    {/* {% if user.is_staff and obj.status == 'APROVADO' %} */}
-                    {status_obj === "APROVADO" && (
-                      <button onClick={() => excluirArquivo(doc.id)}
-                      className="btn btn-sm btn-danger w-100 mt-1">
-                        Excluir
-                      </button>
-                    )}
+                    <div className="mt-auto">
+                      <a href={doc.documento} target="_blank" className="btn btn-sm btn-primary w-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-eye-fill me-1" viewBox="0 0 16 16">
+                          <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
+                          <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
+                        </svg>
+                        Visualizar
+                      </a>
+
+                      {/* {% if user.is_staff and obj.status == 'APROVADO' %} */}
+                      {status_obj === "APROVADO" && (
+                        <button onClick={() => excluirArquivo(doc.id)}
+                        className="btn btn-sm btn-danger w-100 mt-1">
+                          Excluir
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        {/* </div> */}
     </>
   );
 }

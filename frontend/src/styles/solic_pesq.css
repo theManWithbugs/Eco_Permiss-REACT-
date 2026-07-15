@@ -4,7 +4,7 @@
   --primary-color--pesq: #1e5a5a;
   --primary-light--pesq: #2a7a7a;
   --primary-dark: #163f3f;
-  --accent-color: #4dac7d;
+  --accent-color: #61d89c;
   --accent-light: #83c3a7;
   --danger-color: #e74c3c;
   --neutral-light: #f6f8f9;
@@ -56,7 +56,7 @@
 
 /* Header */
 .solic-header {
-  background: linear-gradient(135deg, var(--primary-color--pesq) 70%, var(--accent-color) 100%);
+  background: linear-gradient(135deg, var(--primary-color--pesq) 80%, var(--accent-color) 100%);
   color: white;
   padding: 3.25rem 2.25rem 3rem;
   position: relative;

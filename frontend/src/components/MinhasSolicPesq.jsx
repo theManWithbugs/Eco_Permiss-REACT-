@@ -34,7 +34,6 @@ function MinhasSolicPesq() {
         return response.json();
       })
       .then(data => {
-        console.log(data);
         // Aplicar dados em variaveis reservadas
         setDados(data.objs);
         setPaginaAtual(data.currentPage);
@@ -74,7 +73,11 @@ function MinhasSolicPesq() {
           <br />
           {dados.map((item) => (
             <div className='card_items' key={ item.id }>
-              <h5 className='text-uppercase'>{ item.acao_realizada }</h5>
+              <h5 className='text-uppercase'>
+                {item.acao_realizada?.length > 60
+                  ? item.acao_realizada.slice(0, 60) + '...'
+                  : item.acao_realizada}
+              </h5>
               <div>
                 <span>Status: <span style={{ color: item.status === 'APROVADO' ? '#16a34a' : item.status === 'PENDENTE' ? '#78909c' : item.status === 'INDEFERIDO' ? '#dc2626' : '#1565c0', fontWeight: 600 }}>{ item.status }</span></span>
               </div>

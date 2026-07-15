@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Login from "./components/Login";
 import PageLogin from "./pages/PageLogin";
 import Dashboard from "./pages/Dashboard";
 import MinhasSolic from "./pages/PageMinhSolic";
@@ -11,13 +10,36 @@ import PageInfoPesq from "./pages/PageInfoPesq";
 import PageUsuario from "./pages/PageUsuario";
 import PageSolicUgai from "./pages/PageSolicUgai";
 import PageInfoUgai from "./pages/PageInfoUgai";
+import AlterarDocSolic from "./components/AlterarDocSolic";
+import AlteDadosMembro from "./components/AlterarDadosMemb";
+import RegUser from "./auth/components/RegUser";
+import PageRecCrendenc from "./auth/pages/PageRecCreden";
+import AlterarDadosUser from "./auth/components/AlterarDados";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
 
+        {/* Rotas de auteticação */}
+        {/* ----------------- */}
         <Route path="/login" element={<PageLogin />} />
+        {/* -------------------- */}
+
+        {/* Rota para cadastrar usuário */}
+        {/* ----------------- */}
+        <Route path="/reg_user" element={<RegUser />} />
+        {/* ----------------- */}
+
+        {/* Rota para recuperar credenciais */}
+        {/* ----------------- */}
+        <Route path="/rec_credenc" element={<PageRecCrendenc />} />
+        {/* ----------------- */}
+
+        {/* Rota para alterar dados */}
+        {/* ----------------- */}
+        <Route path="/alt_dados" element={<AlterarDadosUser />} />
+        {/* ----------------- */}
 
         <Route
           path="/home"
@@ -37,20 +59,13 @@ function App() {
           }
         />
 
+        {/* solic de pesquisa */}
+        {/* ----------------- */}
         <Route
           path="/solic_pesquisa"
           element={
             <PrivateRoute>
               <PageSolicPesq />
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/solic_ugai"
-          element={
-            <PrivateRoute>
-              <PageSolicUgai />
             </PrivateRoute>
           }
         />
@@ -63,12 +78,43 @@ function App() {
             </PrivateRoute>
           }
         />
+        {/* ----------------- */}
 
+        {/* info_pesquisa */}
+        {/* ----------------- */}
         <Route
           path="/info_pesquisa"
           element={
             <PrivateRoute>
               <PageInfoPesq />
+            </PrivateRoute>
+          }
+        />
+        {/* ----------------- */}
+
+        <Route
+          path="/solic_ugai"
+          element={
+            <PrivateRoute>
+              <PageSolicUgai />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/alt_memb_data"
+          element={
+            <PrivateRoute>
+              <AlteDadosMembro />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/alt_doc_solic"
+          element={
+            <PrivateRoute>
+              <AlterarDocSolic />
             </PrivateRoute>
           }
         />

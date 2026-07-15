@@ -5,6 +5,35 @@ from core.tasks import send_email
 
 logger = logging.getLogger(__name__)
 
+
+def enviar_codigo_recuperacao(email, username, codigo):
+    mensagem_html = f"""
+    <html>
+    <body style="font-family: Arial, sans-serif; color:#333;">
+        <h2 style="color:#2e7d32;">Código de verificação</h2>
+        <p>Olá, <strong>{username}</strong>.</p>
+        <p>Use o código abaixo para confirmar a recuperação de acesso:</p>
+        <p style="font-size: 24px; font-weight: bold; letter-spacing: 4px;">{codigo}</p>
+    </body>
+    </html>
+    """
+
+    mensagem_texto = f"""
+    Código de verificação
+
+    Olá, {username}.
+
+    Use o código abaixo para confirmar a recuperação de acesso:
+    {codigo}
+    """
+
+    subject = "Código de verificação para recuperação de acesso"
+
+    try:
+        send_email.delay(email, mensagem_texto, mensagem_html, subject)
+    except Exception as exc:
+        logger.exception("Falha ao enfileirar o e-mail de recuperação. %s", exc)
+
 def check_number(phone):
   DDD = str(f"({phone[:2]})")
   number = str(phone[2:])
