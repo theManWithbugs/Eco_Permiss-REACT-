@@ -207,12 +207,12 @@ function InfoPesquisa() {
             </S.Section>
           )}
 
-          <AlterarDocSolic id_pesq={id} />
-
           {/* DocPesquisa (só quando aprovado) */}
           {obj.status === "APROVADO" && (
             <DocPesquisa id_pesquisa={id} status_obj={obj.status} />
           )}
+
+          <AlterarDocSolic id_pesq={id} />
 
           <hr className="ip-divider" />
 

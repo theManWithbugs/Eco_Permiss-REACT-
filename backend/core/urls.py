@@ -6,6 +6,8 @@ from .views import *
 # Rotas de Autenticação
 # =====================
 urlpatterns = [
+    path('api/vagas_dispon_ugai/', vagas_disponiveis_ugai),
+
     # =====================
     # JWT AUTH
     # =====================

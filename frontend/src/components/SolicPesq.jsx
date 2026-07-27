@@ -620,7 +620,7 @@ function SolicPesquisa() {
                   className='solic-input'
                   placeholder='Descreva os retornos à comunidade'
                   value={retComun}
-                  maxLength={150}
+                  maxLength={500}
                   onChange={(e) => setRetCom(e.target.value)}
                 />
               </div>

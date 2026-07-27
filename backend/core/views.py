@@ -1,4 +1,6 @@
 import json
+import os
+import re
 
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
@@ -22,6 +24,7 @@ from .serializers import *
 from .utils import enviar_codigo_recuperacao, enviar_username
 
 from django.views.decorators.csrf import csrf_exempt
+from django.utils.text import slugify
 import random
 
 # =========================
@@ -52,6 +55,23 @@ def max_file_size(file):
         # Ele lança o erro  diretamente no bloco try
         raise ValidationError(f"O arquivo {file.name} ultrapassa o tamanho maximo permitido!")
     return;
+
+# Essa função aqui retira caracteres especias do nome dos arquivos antes de salvar
+def _sanitizar_nome_arquivo(filename):
+    if not filename:
+        return filename
+
+    name, ext = os.path.splitext(filename)
+    name_limpo = slugify(name)
+    if not name_limpo:
+        name_limpo = 'arquivo'
+
+    base_name = re.sub(r'[^a-zA-Z0-9]+', '_', name_limpo).strip('_')
+    if not base_name:
+        base_name = 'arquivo'
+
+    return f"{base_name}{ext.lower()}"
+
 
 @api_view(['GET'])
 # @permission_classes([IsAuthenticated])
@@ -94,20 +114,30 @@ def get_choices(request):
 @api_view(['POST'])
 def reg_usuario(request):
     serializer_user = UserRegistrationSerializer(data=request.data)
-    if serializer_user.is_valid():
+    if not serializer_user.is_valid():
+        return Response(serializer_user.errors, status=400)
+
+    try:
         user = serializer_user.save()
-        try:
-            enviar_username(user.email, user.username)
-        except Exception as exc:
-            print(f"Falha ao enviar e-mail de cadastro: {exc}")
+    except Exception as exc:
+        print(f"Falha ao cadastrar usuário: {exc}")
         return Response(
-            {
-                "messages": "Usuário criado com sucesso!",
-                "username": user.username,
-            },
-            status=201,
+            {"message": "Não foi possível concluir o cadastro. Tente novamente."},
+            status=500,
         )
-    return Response(serializer_user.errors, status=400)
+
+    try:
+        enviar_username(user.email, user.username)
+    except Exception as exc:
+        print(f"Falha ao enviar e-mail de cadastro: {exc}")
+
+    return Response(
+        {
+            "messages": "Usuário criado com sucesso!",
+            "username": user.username,
+        },
+        status=201,
+    )
 
 #----------------------------------------------------------------------------------------#
 #----------------------------------------------------------------------------------------#
@@ -392,24 +422,27 @@ def solic_pesquisa(request):
 
         doc_ident = request.FILES.get('doc_ident')
         if doc_ident:
+            nome_seguro = _sanitizar_nome_arquivo(doc_ident.name)
             path = default_storage.save(
-                f'docs_pesquisa/{ano}/{mes}/doc_ident/{doc_ident.name}',
+                f'docs_pesquisa/{ano}/{mes}/doc_ident/{nome_seguro}',
                 ContentFile(doc_ident.read())
             )
             pesquisa.doc_ident = path
 
         doc_cpf = request.FILES.get('doc_cpf')
         if doc_cpf:
+            nome_seguro = _sanitizar_nome_arquivo(doc_cpf.name)
             path = default_storage.save(
-                f'docs_pesquisa/{ano}/{mes}/doc_cpf/{doc_cpf.name}',
+                f'docs_pesquisa/{ano}/{mes}/doc_cpf/{nome_seguro}',
                 ContentFile(doc_cpf.read())
             )
             pesquisa.doc_cpf = path
 
         doc_seg_vida = request.FILES.get('doc_seg_vida')
         if doc_seg_vida:
+            nome_seguro = _sanitizar_nome_arquivo(doc_seg_vida.name)
             path = default_storage.save(
-                f'docs_pesquisa/{ano}/{mes}/doc_seg_vida/{doc_seg_vida.name}',
+                f'docs_pesquisa/{ano}/{mes}/doc_seg_vida/{nome_seguro}',
                 ContentFile(doc_seg_vida.read())
             )
             pesquisa.doc_seg_vida = path
@@ -929,3 +962,15 @@ def alterar_files_solic(request):
         )
 #----------------------------------------------------------------------------------------#
 #----------------------------------------------------------------------------------------#
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def vagas_disponiveis_ugai(request):
+
+    nome_ugai = request.data.get('nome_ugai')
+    ugais = Ugai.objects.filter(nome=nome_ugai)
+
+    for x in ugais:
+        print(x)
+
+    return Response({"message": "ok"}, status=200)

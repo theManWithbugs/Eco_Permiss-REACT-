@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from django.db import transaction
 import re
+import unicodedata
 from .models import *
 
 User = get_user_model()
@@ -218,15 +220,30 @@ class UserRegistrationSerializer(serializers.Serializer):
             raise serializers.ValidationError("Este CPF já está cadastrado.")
         return value
 
+    @transaction.atomic
     def create(self, validated_data):
-        # 1. Geração automatizada do username baseado em nome + sobrenome
-        first_name = validated_data['first_name'].strip().lower()
-        last_name = validated_data['last_name'].strip().lower()
+        # 1. Geração automatizada do username com primeiro nome + primeiro sobrenome
+        def normalize_name_part(value):
+            normalized = unicodedata.normalize('NFKD', value or '').encode('ascii', 'ignore').decode('ascii')
+            return re.sub(r'[^a-z0-9]+', '', normalized.lower())
 
-        first_name = re.sub(r'\s+', '', first_name)
-        last_name = re.sub(r'\s+', '', last_name)
+        first_name_tokens = [token for token in validated_data['first_name'].split() if token]
+        last_name_tokens = [token for token in validated_data['last_name'].split() if token]
 
-        username_base = f"{first_name}.{last_name}"
+        first_name_part = normalize_name_part(first_name_tokens[0] if first_name_tokens else '')
+
+        particles = {'de', 'da', 'do', 'dos', 'das', 'di', 'del', 'della', 'la', 'le', 'van', 'von'}
+        surname_part = ''
+        for token in last_name_tokens:
+            token_normalized = normalize_name_part(token)
+            if token_normalized and token_normalized not in particles:
+                surname_part = token_normalized
+                break
+
+        if not surname_part and last_name_tokens:
+            surname_part = normalize_name_part(last_name_tokens[0])
+
+        username_base = f"{first_name_part}.{surname_part}" if first_name_part and surname_part else first_name_part or surname_part
         username = username_base
 
         contador = 1
@@ -244,6 +261,7 @@ class UserRegistrationSerializer(serializers.Serializer):
         )
 
         # 3. Criação dos Dados Pessoais vinculados
+        # (dentro da mesma transação: se isso falhar, a criação do User acima é revertida)
         DadosPessoais.objects.create(
             usuario=user,
             ori_sexual=validated_data['ori_sexual'], # Mapeia para o seu campo do model

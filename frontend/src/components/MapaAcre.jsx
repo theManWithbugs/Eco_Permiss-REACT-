@@ -1,6 +1,8 @@
 import Mapa from "../img/mapa_acre.svg?react";
 import Swal from 'sweetalert2';
 import TurmaAntimary from "../img/img_antimary_turma.jpg"
+import img_antimary from "../img/ugai_antimary.jpeg"
+
 import img_liberdade_01 from "../img/ugai_liberdade_01.jpg"
 import img_liberdade_02 from "../img/ugai_liberdade_02.jpg"
 import img_acuraua_01 from "../img/img_acuraua_01.jpg"
@@ -8,6 +10,9 @@ import img_acuraua_02 from "../img/img_acuraua_02.jpg"
 
 import img_chandles_01 from "../img/img_chandles_01.jpg"
 import img_chandles_02 from "../img/img_chandles_02.jpg"
+
+import img_ugai_afluente_01 from "../img/ugai_afluente_01.jpeg"
+import img_ugai_afluente_02 from "../img/ugai_afluente_02.jpeg"
 
 function MapaAcre() {
     return (
@@ -26,7 +31,7 @@ function MapaAcre() {
                         Swal.fire({
                             title: "UGAI-Antimary",
                             text: "Fica na Floresta Estadual do Antimary (FEA), no km 105 da BR-364 (sentido Sena Madureira) e Ramal do Ouro, km 23, entre os municípios de Bujari e Sena Madureira, no Acre",
-                            imageUrl: TurmaAntimary,
+                            imageUrl: img_antimary,
                             imageWidth: 400,
                             imageHeight: 200,
                             imageAlt: "Custom image"
@@ -51,7 +56,20 @@ function MapaAcre() {
                     }
 
                     if (id === "afluente"){
-                        alert("UGAI Afluente");
+                        Swal.fire({
+                            title: "UGAI-Afluente",
+                            html: `
+                                <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                                    <img src="${img_ugai_afluente_01}" alt="UGAI-Afluente_01" style="width:180px; border-radius:6px;" />
+                                    <img src="${img_ugai_afluente_02}" alt="UGAI-Afluente_02" style="width:180px; border-radius:6px;" />
+                                </div>
+                                    <br>
+                                <span>
+                                    A Unidade de Gestão Ambiental Integrada (UGAI) do Afluente está localizada no quilômetro 48 da rodovia BR-364, inserida na Floresta Estadual do Afluente (Complexo do Seringal Jurupari). A base fica estrategicamente posicionada entre os municípios de Manoel Urbano e Feijó, na regional do Purus/Envira, no estado do Acre.
+                                </span>
+                            `,
+                            confirmButtonText: 'Fechar'
+                        });
                     }
 
                     if (id === "acuraua"){

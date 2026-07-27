@@ -73,6 +73,16 @@ function RegUser() {
       return;
     }
 
+    if (!oriSexual) {
+      toast.warning("Selecione a orientação sexual!");
+      return;
+    }
+
+    if (!numero || isNaN(Number(numero))) {
+      toast.warning("Informe um número válido para o endereço!");
+      return;
+    }
+
     const dados = {
       first_name,
       last_name,
@@ -106,7 +116,8 @@ function RegUser() {
       const data = await res.json();
 
       if (!res.ok) {
-        const mensagem = Object.values(data)[0]?.[0];
+        const primeiroValor = Object.values(data)[0];
+        const mensagem = Array.isArray(primeiroValor) ? primeiroValor[0] : primeiroValor;
         throw new Error(mensagem || "Erro ao cadastrar usuário.");
       }
 
@@ -189,9 +200,14 @@ function RegUser() {
               onChange={(e) => setConfPassw(e.target.value)}
             />
 
-            <select className='form-select mt-3 mb-1 text-secondary' defaultValue="">
+            <select
+              required
+              className='form-select mt-3 mb-1 text-secondary'
+              value={oriSexual}
+              onChange={(e) => setOriSexual(e.target.value)}
+            >
               {choices_ori.map((ori) => (
-                <option value={ori.value} key={ori.value} onClick={() => setOriSexual(ori.value)}>
+                <option value={ori.value} key={ori.value}>
                   {ori.label}</option>
               ))}
             </select>
@@ -249,7 +265,7 @@ function RegUser() {
             />
 
             <input
-
+              required
               type="text"
               className="input"
               placeholder="Número"

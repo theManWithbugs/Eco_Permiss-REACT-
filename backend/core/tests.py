@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
 
-from core.models import DadosPessoais, User
+from core.models import DadosPessoais, User, get_path_doc, get_path_rel, get_path_membro_doc
 
 
 class RecuperacaoCredenciaisTests(TestCase):
@@ -120,3 +120,17 @@ class AlterarDadosUserTests(TestCase):
         self.assertEqual(self.dados.cep, '69900-000')
         self.assertEqual(self.dados.logradouro, 'Rua B')
         self.assertEqual(self.dados.telefone_fixo, '6833334444')
+
+
+class UploadPathTests(TestCase):
+    def test_gerar_path_de_upload_sem_caracteres_nao_ascii(self):
+        path_doc = get_path_doc(None, 'Documento º 2026.pdf')
+        path_rel = get_path_rel(None, 'Relatório 1º.pdf')
+        path_membro = get_path_membro_doc(None, 'Foto_ç_ç.pdf')
+
+        self.assertNotIn('º', path_doc)
+        self.assertNotIn('º', path_rel)
+        self.assertNotIn('ç', path_membro)
+        self.assertTrue(path_doc.endswith('Documento_2026.pdf'))
+        self.assertTrue(path_rel.endswith('Relatorio_1.pdf'))
+        self.assertTrue(path_membro.endswith('Foto_c_c.pdf'))

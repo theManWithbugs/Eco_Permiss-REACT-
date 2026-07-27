@@ -2,8 +2,10 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
+from django.utils.text import slugify
 import uuid
 import os
+import re
 
 #Local imports
 from .choices import *
@@ -14,6 +16,22 @@ def validate_file_size(value):
     if value.size > limit:
         raise ValidationError('O arquivo não pode ser maior que 5MB.')
 
+def _normalizar_nome_arquivo(filename):
+    if not filename:
+        return filename
+
+    name, ext = os.path.splitext(filename)
+    name_limpo = slugify(name)
+    if not name_limpo:
+        name_limpo = 'arquivo'
+
+    base_name = re.sub(r'[^a-zA-Z0-9]+', '_', name_limpo).strip('_')
+    if not base_name:
+        base_name = 'arquivo'
+
+    return f"{base_name}{ext.lower()}"
+
+
 def get_path_rel(_instance, filename):
     ano = timezone.now().year
     mes_num = timezone.now().month
@@ -23,7 +41,8 @@ def get_path_rel(_instance, filename):
     ]
     mes = meses[mes_num]
 
-    return os.path.join('docs_pesquisa', str(ano), mes, 'rel_final', filename)
+    filename_limpo = _normalizar_nome_arquivo(filename)
+    return os.path.join('docs_pesquisa', str(ano), mes, 'rel_final', filename_limpo)
 
 def get_path_doc(_instance, filename):
     ano = timezone.now().year
@@ -34,7 +53,8 @@ def get_path_doc(_instance, filename):
     ]
     mes = meses[mes_num]
 
-    return os.path.join('doc_usuario', str(ano), mes, filename)
+    filename_limpo = _normalizar_nome_arquivo(filename)
+    return os.path.join('doc_usuario', str(ano), mes, filename_limpo)
 
 
 def get_path_membro_doc(_instance, filename):
@@ -46,7 +66,8 @@ def get_path_membro_doc(_instance, filename):
     ]
     mes = meses[mes_num]
 
-    return os.path.join('docs_pesquisa', str(ano), mes, 'doc_membro_equipe', filename)
+    filename_limpo = _normalizar_nome_arquivo(filename)
+    return os.path.join('docs_pesquisa', str(ano), mes, 'doc_membro_equipe', filename_limpo)
 
 
 class User(AbstractUser):
@@ -74,7 +95,7 @@ class DadosPessoais(models.Model):
     telefone_fixo = models.CharField(max_length=10, blank=True)
     cep = models.CharField(blank=True, max_length=9, verbose_name='CEP')
     profissao = models.CharField(blank=False, max_length=30, verbose_name='Profissão/Ocupação')
-    codigo_recup = models.IntegerField()
+    codigo_recup = models.IntegerField(default=0, blank=True)
 
     def __str__(self):
         return self.usuario.get_full_name() or self.usuario.username
@@ -339,7 +360,7 @@ class DadosSolicUgai(models.Model):
     )
 
     ativ_desenv = models.CharField(
-        max_length=200,
+        max_length=800,
         verbose_name='Atividades que irá desenvolver'
     )
 

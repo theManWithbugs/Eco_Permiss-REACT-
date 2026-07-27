@@ -203,6 +203,21 @@ function RenderFormset() {
     <>
       <NavUser />
       <ToastContainer />
+      <div className='container' style={{ maxWidth: "1230px" }}>
+        <div className='solic-field' style={{ marginTop: '1.5rem' }}>
+          <div className='solic-upload-info'>
+            <p className='solic-upload-info-title'>Orientações</p>
+            <ul>
+              <li>Envie arquivos em PDF.</li>
+              <li><span className='text-danger fw-bold'> Documento de Identidade,
+                  CPF e Seguro de Vida são obrigatórios.</span></li>
+              <li>Cada campo aceita <strong>um arquivo</strong>.</li>
+              <li>Tamanho máximo por arquivo: 5 MB.</li>
+              <li>Use nomes de arquivo claros e objetivos.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
       <div className='membro-equipe-wrapper'>
         <div className='membro-equipe-container'>
 
@@ -372,20 +387,6 @@ function RenderFormset() {
                     </div>
                   ))}
                 </div>
-
-                <div className='solic-field' style={{ marginTop: '1.5rem' }}>
-                  <div className='solic-upload-info'>
-                    <p className='solic-upload-info-title'>Orientações</p>
-                    <ul>
-                      <li>Envie arquivos em PDF.</li>
-                      <li><span className='text-danger fw-bold'> Documento de Identidade,
-                         CPF e Seguro de Vida são obrigatórios.</span></li>
-                      <li>Cada campo aceita <strong>um arquivo</strong>.</li>
-                      <li>Tamanho máximo por arquivo: 5 MB.</li>
-                      <li>Use nomes de arquivo claros e objetivos.</li>
-                    </ul>
-                  </div>
-                </div>
               </div>
 
               {formsets.length > 1 && (
@@ -407,7 +408,7 @@ function RenderFormset() {
               Adicionar Membro
             </button>
             <button type='button' onClick={enviarDados} className='membro-btn membro-btn-submit'>
-              ✓ Enviar Formulário
+              ✓ Enviar
             </button>
           </div>
 

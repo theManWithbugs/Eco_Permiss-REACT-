@@ -138,7 +138,7 @@ function AlterarDocSolic({ id_pesq }) {
         draggable
       />
 
-      <div className='container'>
+      <div className='container mt-4'>
         <div className='ip-section-label'>
           <IconReload />
           Alterar documentos do solicitante

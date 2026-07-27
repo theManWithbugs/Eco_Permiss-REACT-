@@ -157,3 +157,13 @@ CELERY_TASK_ACKS_LATE = True
 CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 CELERY_WORKER_POOL = 'solo'
 CELERY_WORKER_CONCURRENCY = 1
+
+# Força o backend de resultados a usar RESP2
+CELERY_REDIS_BACKEND_TRANSPORT_OPTIONS = {
+    'protocol_version': 2
+}
+
+# Força o broker a usar RESP2
+CELERY_BROKER_TRANSPORT_OPTIONS = {
+    'protocol_version': 2
+}
