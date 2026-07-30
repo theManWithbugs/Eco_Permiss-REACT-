@@ -12,6 +12,7 @@ function MinhasSolicUgai() {
   const token = localStorage.getItem("access");
 
   function infoUgai(item) {
+    console.log(item);
     navigate('/info_ugai', { state: item });
   }
 
@@ -77,7 +78,7 @@ function MinhasSolicUgai() {
             <div>
               <span>Status: <span style={{ color: item.status === 'APROVADO' ? '#16a34a' : item.status === 'PENDENTE' ? '#78909c' : item.status === 'INDEFERIDO' ? '#dc2626' : '#1565c0', fontWeight: 600 }}>{ item.status }</span></span>
             </div>
-            <a style={{ cursor: 'pointer', color: 'white' }} onClick={() => infoUgai(item)}>
+            <a style={{ cursor: 'pointer', color: 'white' }} onClick={() => infoUgai(item.id_public)}>
               Ver detalhes</a>
           </div>
         ))}

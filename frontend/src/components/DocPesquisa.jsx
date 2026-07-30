@@ -4,8 +4,24 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast, Bounce } from 'react-toastify';
 import ImgPDF from "../img/pdf_img.png";
 import API_URL, { showToast } from "../constants/global.js";
-import '../styles/file_info_form.css';
 import Swal from 'sweetalert2';
+import {
+  Title,
+  UploadContainer,
+  UploadLabel,
+  UploadDesign,
+  BrowseButton,
+  DocumentGrid,
+  DocumentColumn,
+  DocumentCard,
+  CardBody,
+  PdfContainer,
+  CardTitle,
+  CardDate,
+  ButtonContainer,
+  ViewButton,
+  DeleteButton,
+} from "../styles/file_info_form.js";
 
 function DocPesquisa({ id_pesquisa, status_obj }) {
   const [docs, setDocs] = useState([]);
@@ -167,71 +183,100 @@ function DocPesquisa({ id_pesquisa, status_obj }) {
 
   return (
     <>
-    <hr />
-      <h5>Anexar relatórios da pesquisa</h5>
-        <form id="fileUploadForm" className="file-upload-form">
-          <label htmlFor="file" className="file-upload-label">
-            <div className="file-upload-design">
-              <svg viewBox="0 0 640 512" height="1em">
-                <path d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128H144zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39V392c0 13.3 10.7 24 24 24s24-10.7 24-24V257.9l39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"></path>
-              </svg>
-              <span className="browse-button">Selecione</span>
-            </div>
-            <input
-              id="file"
-              type="file"
-              name="documento"
-              onChange={handleFileChange}
-            />
-          </label>
-        </form>
-        {/* <div className='p-4'> */}
-          <div className="row">
-            {docs.map((doc, index) => (
-              <div className="col-md-3 bg-light p-4 mt-3" key={index}>
-                {/* <a href={doc.documento} target="_blank"></a> */}
-                <div className="card document-card h-100 border-0">
-                  <div className="card-body d-flex flex-column">
-                    <div className="text-center mb-3">
-                      <img src={ImgPDF} alt="" width="85px" />
-                    </div>
+      <hr />
+    <Title style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}>
+      ( Anexar relatórios da pesquisa )
+    </Title>
 
-                    <h6 className="card-title text-truncate" title={ doc.documento }>
-                      { formtNomeDoc(doc.documento) }
-                    </h6>
+    <UploadContainer id="fileUploadForm">
+      <UploadLabel htmlFor="file">
+        <UploadDesign>
+          <svg viewBox="0 0 640 512" height="1em">
+            <path d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128H144zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39V392c0 13.3 10.7 24 24 24s24-10.7 24-24V257.9l39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z" />
+          </svg>
 
-                    <small className="text-muted mb-3">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" className="bi bi-calendar me-1" viewBox="0 0 16 16">
-                        <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
-                      </svg>
-                      { formtDate(doc.upado_em) }
-                    </small>
+          <BrowseButton>Selecione</BrowseButton>
+        </UploadDesign>
 
-                    <div className="mt-auto">
-                      <a href={doc.documento} target="_blank" className="btn btn-sm btn-primary w-100">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-eye-fill me-1" viewBox="0 0 16 16">
-                          <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
-                          <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
-                        </svg>
-                        Visualizar
-                      </a>
+        <input
+          id="file"
+          type="file"
+          name="documento"
+          onChange={handleFileChange}
+        />
+      </UploadLabel>
+    </UploadContainer>
 
-                      {/* {% if user.is_staff and obj.status == 'APROVADO' %} */}
-                      {status_obj === "APROVADO" && (
-                        <button onClick={() => excluirArquivo(doc.id)}
-                        className="btn btn-sm btn-danger w-100 mt-1">
-                          Excluir
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        {/* </div> */}
-    </>
-  );
+    <DocumentGrid className="row">
+      {docs.map((doc, index) => (
+        <DocumentColumn
+          className="col-md-3 bg-light p-4"
+          key={index}
+        >
+          <DocumentCard className="card">
+            <CardBody className="card-body">
+              <PdfContainer>
+                <img src={ImgPDF} alt="PDF" width="85" />
+              </PdfContainer>
+
+              <CardTitle title={doc.documento}>
+                {formtNomeDoc(doc.documento)}
+              </CardTitle>
+
+              <CardDate>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  fill="currentColor"
+                  className="bi bi-calendar me-1"
+                  viewBox="0 0 16 16"
+                >
+                  <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z" />
+                </svg>
+
+                {formtDate(doc.upado_em)}
+              </CardDate>
+
+              <ButtonContainer>
+                <ViewButton
+                  href={doc.documento}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-sm btn-primary"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    className="bi bi-eye-fill me-1"
+                    viewBox="0 0 16 16"
+                  >
+                    <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0" />
+                    <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7" />
+                  </svg>
+
+                  Visualizar
+                </ViewButton>
+
+                {status_obj === "APROVADO" && (
+                  <DeleteButton
+                    type="button"
+                    onClick={() => excluirArquivo(doc.id)}
+                    className="btn btn-sm btn-danger"
+                  >
+                    Excluir
+                  </DeleteButton>
+                )}
+              </ButtonContainer>
+            </CardBody>
+          </DocumentCard>
+        </DocumentColumn>
+      ))}
+    </DocumentGrid>
+  </>
+);
 }
 
 export default DocPesquisa;

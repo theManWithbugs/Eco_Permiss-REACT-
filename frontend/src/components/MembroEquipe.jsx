@@ -70,7 +70,7 @@ function RenderFormset() {
   ];
 
   const [formsets, setFormsets] = useState([FORM_INICIAL()]);
-  const [errors, setErrors]     = useState([]);
+  const [errors, setErrors] = useState([]);
 
   // ── Handlers de texto/select ──────────────────────────────────────────────
   const handleInputChange = (formId, field, value) => {

@@ -49,7 +49,6 @@ export const getUserData = async (token) => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
-    console.log(data.dados_pessoais);
 
     return data;
   } catch (error) {
@@ -63,6 +62,52 @@ export function formatar_username(first_name, last_name) {
     const last_name_fmrt = last_name.toLowerCase();
     const username = `${first_name_frmt}.${last_name_fmrt}`;
     return username;
+}
+
+// Vai servir sempre que houver necessidade de pegar dados de uma solicitação de UGAI
+export const dataInfoUgai = async (token, id_public) => {
+  try {
+    const response = await fetch(`${API_URL}/api/info_ugai/`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}` ,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(id_public)
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      showToast(500, 'Ocorreu um erro!');
+    }
+    console.log(data);
+    return data;
+
+  } catch (error) {
+    alert(`Ocorreu um erro! ${error}`);
+  }
+}
+
+export const dataInfoPesq = async (token, id_public) => {
+  try {
+    const response = await fetch(`${API_URL}/api/info_pesq/`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}` ,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(id_public)
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      showToast(500, 'Ocorreu um erro!');
+    }
+    return data;
+
+  } catch (error) {
+    alert(`Ocorreu um erro! ${error}`);
+  }
 }
 
 export default API_URL;

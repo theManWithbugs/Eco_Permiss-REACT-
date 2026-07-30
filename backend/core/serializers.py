@@ -59,7 +59,7 @@ class SerializerSolicPesq(serializers.ModelSerializer):
 
 
 # =========================
-# SERIALIZERS DE MEMBROS
+# SERIALIZERS DE MEMBROS DE PESQ
 # =========================
 
 class SerializerMembroEquipe(serializers.ModelSerializer):
@@ -105,9 +105,12 @@ class SerializerGetDataUgai(serializers.ModelSerializer):
     """
     Serializa DadosSolicUgai para listagem/detalhe.
     """
+    # Pegando campo de outro modelo interligado e enviando direto
+    nome_ugai = serializers.ReadOnlyField(source='ugai.nome')
+
     class Meta:
         model = DadosSolicUgai
-        fields = "__all__"
+        exclude = ['id']
 
 class SerializerRegUGAI(serializers.ModelSerializer):
     """
@@ -121,6 +124,14 @@ class SerializerRegUGAI(serializers.ModelSerializer):
             'recusa_motivo',
             'status',
         ]
+
+# =========================
+# SERIALIZERS DE MEMBROS DE UGAI
+# =========================
+class SerializerMembrosUgai(serializers.ModelSerializer):
+    class Meta:
+        model = MembroEquipeUGAI
+        exclude = ['solicitacao_ref']
 
 # =========================
 # SERIALIZERS DE USER

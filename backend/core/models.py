@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Sum
 from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
@@ -125,6 +126,11 @@ class AreaAtuacao(models.Model):
 
 class DadosSolicPesquisa(models.Model):
     id = models.BigAutoField(primary_key=True)
+    id_public = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True  # Indexa e garante unicidade sem ser PK
+    )
 
     user_solic = models.ForeignKey(
         User,
@@ -308,23 +314,29 @@ class Ugai(models.Model):
 
     #"lte less than or equal", menor ou igual a data que foi solicitada
     #"gte greater than or equal": maior ou igual a data que foi solicitada
-    # def vagas_ocupadas(self, inicio, fim):
-    #     resultado = self.solicitacoes.filter(
-    #         status='APROVADO',
-    #         data_inicio__lte=fim,
-    #         data_final__gte=inicio
-    #     ).aggregate(
-    #         total=Sum("quantidade_pessoas")
-    #     )
+    def vagas_ocupadas(self, inicio, fim):
+        resultado = self.solicitacoes.filter(
+            status='APROVADO',
+            data_inicio__lte=fim,
+            data_final__gte=inicio
+        ).aggregate(
+            total=Sum("quantidade_pessoas")
+        )
 
-    #     return resultado["total"] or 0
+        return resultado["total"] or 0
 
-    # # 🔹 Calcula vagas disponíveis
-    # def vagas_disponiveis(self, inicio, fim):
-    #     return self.total_vagas - self.vagas_ocupadas(inicio, fim)
+    # 🔹 Calcula vagas disponíveis
+    def vagas_disponiveis(self, inicio, fim):
+        return self.total_vagas - self.vagas_ocupadas(inicio, fim)
 
 class DadosSolicUgai(models.Model):
+    # Comecei a utilizar um abordagem híbrida
     id = models.BigAutoField(primary_key=True)
+    id_public = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True  # Indexa e garante unicidade sem ser PK
+    )
 
     user_solic = models.ForeignKey(
         User,

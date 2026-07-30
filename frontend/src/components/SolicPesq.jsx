@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import buscarChoicesDoBanco from '../constants/choices';
 import API_URL, { getUserData, showToast } from "../constants/global.js";
 import '../styles/solic_pesq.css';
-import '../styles/file_info_form.css';
 import ImgPDF from "../img/pdf_img.png";
 import 'react-toastify/dist/ReactToastify.css';
 import { toast } from 'react-toastify';

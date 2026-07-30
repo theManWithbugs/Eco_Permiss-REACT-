@@ -5,6 +5,7 @@ import '../styles/info_pesquisa.css';
 import DocPesquisa from './DocPesquisa';
 import API_URL from "../constants/global.js";
 import ImgPDF from "../img/pdf_img.png";
+import { dataInfoPesq } from '../constants/global.js';
 import {
   IconFolder,
   IconClipboard,
@@ -64,6 +65,7 @@ const formatarNomeArquivo = (url) => {
 function InfoPesquisa() {
   const navigate = useNavigate();
   const location = useLocation();
+  const token = localStorage.getItem("access");
   const id = location.state?.id;
 
   const [membros, setMembros] = useState([]);
@@ -91,26 +93,34 @@ function InfoPesquisa() {
     }
   };
 
-  const infoPesquisa = async () => {
-    const token = localStorage.getItem("access");
-    if (!token) { navigate('/login'); return; }
-    try {
-      const res  = await fetch(`${API_URL}/api/info_pesq/`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) { toast.error("Erro ao buscar dados"); return; }
-      setObj(await res.json());
-    } catch (e) {
-      toast.warning(`Erro na requisição: ${e}`);
-    }
-  };
+  // const infoPesquisa = async () => {
+  //   const token = localStorage.getItem("access");
+  //   if (!token) { navigate('/login'); return; }
+  //   try {
+  //     const res  = await fetch(`${API_URL}/api/info_pesq/`, {
+  //       method: "POST",
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //         "Content-Type": "application/json"
+  //       },
+  //       body: JSON.stringify(payload),
+  //     });
+  //     if (!res.ok) { toast.error("Erro ao buscar dados"); return; }
+  //     setObj(await res.json());
+  //   } catch (e) {
+  //     toast.warning(`Erro na requisição: ${e}`);
+  //   }
+  // };
 
   useEffect(() => {
     if (!id) { navigate('/minhas_solic'); return; }
     buscarMembros();
-    infoPesquisa();
+    // infoPesquisa();
+    const carregarDados = async () => {
+      const dados = await dataInfoPesq(token, payload);
+      setObj(dados);
+    }
+    carregarDados();
   }, [id, navigate]);
 
   return (

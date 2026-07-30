@@ -55,7 +55,7 @@ function SolicUgai() {
         body: JSON.stringify(payload),
       });
 
-      const data = await response.json();
+      const id_public = await response.json();
 
       if (!response.ok) {
         setErrors(data);
@@ -71,7 +71,7 @@ function SolicUgai() {
         draggable: true
       }).then((result) => {
         if (result.isConfirmed) {
-          navigate('/minhas_solic');
+          navigate('/membros_ugai', { state: id_public });
         }
       });
       setErrors({});
@@ -131,7 +131,7 @@ function SolicUgai() {
                   value={ugai}
                   onChange={(e) => setUgai(e.target.value)}
                 >
-                  <option value=''>Selecione a UGAI</option>
+                  <option value=''>- - - - - - - - - - - - - - - -</option>
                   {choicesUgaisDict.map((item) => (
                     <option value={item.value} key={item.value}>{ item.label }</option>
                   ))}

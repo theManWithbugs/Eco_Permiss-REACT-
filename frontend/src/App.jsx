@@ -15,6 +15,7 @@ import AlteDadosMembro from "./components/AlterarDadosMemb";
 import RegUser from "./auth/components/RegUser";
 import PageRecCrendenc from "./auth/pages/PageRecCreden";
 import AlterarDadosUser from "./auth/components/AlterarDados";
+import MembroEquipeUGAI from "./components/EquipeUGAI";
 
 function App() {
   return (
@@ -119,6 +120,8 @@ function App() {
           }
         />
 
+        {/* UGAI */}
+        {/* ----------------- */}
         <Route
           path="/info_ugai"
           element={
@@ -127,6 +130,16 @@ function App() {
             </PrivateRoute>
           }
         />
+
+        <Route
+          path="/membros_ugai"
+          element={
+            <PrivateRoute>
+              <MembroEquipeUGAI />
+            </PrivateRoute>
+          }
+        />
+        {/* ----------------- */}
 
         <Route
           path="/perfil"

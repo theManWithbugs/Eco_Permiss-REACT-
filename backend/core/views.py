@@ -86,6 +86,8 @@ def get_choices(request):
     #Choices solic_ugai
     ugais = CHOICES_UGAIS
     ori_sexual = ORIENTACOES_CHOICES
+    raca = RACA_CHOICES
+    genero = IDENTIDADE_GENERO_CHOICES
     ugais_now = Ugai.objects.all()
 
     itens_ugais = []
@@ -99,6 +101,8 @@ def get_choices(request):
         "choices_area": areas_atuacao,
         "choices_ugais": ugais,
         "choices_ori": ori_sexual,
+        "choices_raca": raca,
+        "genero": genero,
         "ugais": itens_ugais
     }
     return Response(data=dados, status=200)
@@ -239,6 +243,10 @@ def alterar_dados_user(request):
 #----------------------------------------------------------------------------------------#
 #----------------------------------------------------------------------------------------#
 
+
+# =========================
+# PEGAR DADOS DO USUARIO
+# =========================
 #----------------------------------------------------------------------------------------#
 #----------------------------------------------------------------------------------------#
 
@@ -269,7 +277,14 @@ def get_user_data(request):
             status=500,
         )
 
+#----------------------------------------------------------------------------------------#
+#----------------------------------------------------------------------------------------#
 
+# =========================
+# SOLICITAÇÕES DE PESQUISA DO USUARIO
+# =========================
+#----------------------------------------------------------------------------------------#
+#----------------------------------------------------------------------------------------#
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def solic_pesq_user(request):
@@ -296,8 +311,14 @@ def solic_pesq_user(request):
         'hasNext': page_obj.has_next(),
         'hasPrevious': page_obj.has_previous()
     })
+#----------------------------------------------------------------------------------------#
+#----------------------------------------------------------------------------------------#
 
-
+# =========================
+# SOLICITAÇÕES DE UGAI
+# =========================
+#----------------------------------------------------------------------------------------#
+#----------------------------------------------------------------------------------------#
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def minhas_solic_ugai(request):
@@ -306,7 +327,7 @@ def minhas_solic_ugai(request):
     """
 
     objs = DadosSolicUgai.objects.filter(
-        user_solic=request.user).order_by('-data_solicitacao')
+        user_solic=request.user).select_related('ugai').order_by('-data_solicitacao')
 
     page_number = request.GET.get('page', 1)
     paginator = Paginator(objs, 10)
@@ -316,7 +337,9 @@ def minhas_solic_ugai(request):
     for item in page_obj:
         d = model_to_dict(item)
         d["ugai"] = str(item.ugai)
-        d['id'] = str(item.id)
+        if 'id' in d:
+            del d['id']
+        d['id_public'] = str(item.id_public)
         itens_json.append(d)
 
     return JsonResponse({
@@ -326,6 +349,8 @@ def minhas_solic_ugai(request):
         'hasNext': page_obj.has_next(),
         'hasPrevious': page_obj.has_previous()
     })
+#----------------------------------------------------------------------------------------#
+#----------------------------------------------------------------------------------------#
 
 # =========================
 # REALIZAR SOLIC_PESQ
@@ -509,11 +534,12 @@ def solic_ugai(request):
             quantidade_pessoas=2,
             status="PENDENTE"
         )
-        return Response(serializer.data, status=200)
+        return Response(serializer.data['id_public'], status=200)
     return Response(serializer.errors, status=400)
 
 #----------------------------------------------------------------------------------------#
 #----------------------------------------------------------------------------------------#
+
 
 # =========================
 # INFORMAÇÕES DA SOLIC_PESQUISA
@@ -548,12 +574,17 @@ def info_pesquisa(request):
     obj = get_object_or_404(DadosSolicPesquisa, id=id)
 
     serializer = SerializerInfoPesq(
-        obj,
+        instance=obj,
         context={'request': request}
     )
 
     return Response(serializer.data, status=200)
 
+# =========================
+# ARQUIVOS DA PESQUISA
+# =========================
+#----------------------------------------------------------------------------------------#
+#----------------------------------------------------------------------------------------#
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 @parser_classes((MultiPartParser, FormParser))
@@ -607,7 +638,6 @@ def get_url_doc(request):
         # ATENÇÃO: Logar exceções em produção
         return Response(f"Ocorreu um erro: {e}", status=500)
 
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def excluir_arq(request):
@@ -626,6 +656,14 @@ def excluir_arq(request):
     except ArquivosRelFinal.DoesNotExist:
         return Response("Documento não encontrado", status=404)
 
+#----------------------------------------------------------------------------------------#
+#----------------------------------------------------------------------------------------#
+
+# =========================
+# MEMBROS DA PESQUISA
+# =========================
+#----------------------------------------------------------------------------------------#
+#----------------------------------------------------------------------------------------#
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def membros_pesq(request):
@@ -696,6 +734,10 @@ def info_membro_pesq(request):
 
     return Response(serializer.data, status=200)
 
+
+# =========================
+# ADICIONAR MEMBRO A PESQUISA
+# =========================
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 @parser_classes([MultiPartParser, FormParser])
@@ -837,6 +879,9 @@ def alt_doc_memb_pesq(request):
         status=200
     )
 
+#----------------------------------------------------------------------------------------#
+#----------------------------------------------------------------------------------------#
+
 # =========================
 # ALTERAR DOCUMENTOS DO SOLICITANTE DA PESQUISA
 # =========================
@@ -963,14 +1008,80 @@ def alterar_files_solic(request):
 #----------------------------------------------------------------------------------------#
 #----------------------------------------------------------------------------------------#
 
+# =========================
+# VERIFICAR VAGAS DISPONÍVEIS NA UGAI
+# =========================
+#----------------------------------------------------------------------------------------#
+#----------------------------------------------------------------------------------------#
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def vagas_disponiveis_ugai(request):
 
-    nome_ugai = request.data.get('nome_ugai')
-    ugais = Ugai.objects.filter(nome=nome_ugai)
+    id_ugai = request.data.get('id')
+    obj = get_object_or_404(DadosSolicUgai, id=id_ugai)
+    current_ugai = get_object_or_404(Ugai, id=obj.ugai.id)
 
-    for x in ugais:
-        print(x)
+    data_inicio = obj.data_inicio
+    data_final = obj.data_final
 
-    return Response({"message": "ok"}, status=200)
+    vagas = current_ugai.vagas_disponiveis(data_inicio, data_final)
+
+    return Response({"message", f"{vagas}"}, status=200)
+
+#----------------------------------------------------------------------------------------#
+#----------------------------------------------------------------------------------------#
+
+# =========================
+# INFORMAÇÃO DE SOLICITAÇÃO DE UGAI
+# =========================
+#----------------------------------------------------------------------------------------#
+#----------------------------------------------------------------------------------------#
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def info_ugai(request):
+    id_public = request.data
+
+    if not id_public:
+        return Response({"message": "O campo id é necessario!"}, status=400)
+
+    obj = get_object_or_404(DadosSolicUgai.objects,
+                            id_public=id_public)
+
+    obj_ugai = MembroEquipeUGAI.objects.filter(solicitacao_ref=obj.id)
+
+    serializer = SerializerGetDataUgai(instance=obj)
+    serializer_membro = SerializerMembrosUgai(instance=obj_ugai, many=True)
+
+    return Response({
+        "solicitacao": serializer.data,
+        "membros": serializer_membro.data
+    }, status=200)
+#----------------------------------------------------------------------------------------#
+#----------------------------------------------------------------------------------------#
+
+# =========================
+# MEMBRO EQUIPE DE UGAI
+# =========================
+#----------------------------------------------------------------------------------------#
+#----------------------------------------------------------------------------------------#
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def membro_ugai(request):
+
+    formsets = request.data.get('formsets')
+    id_solic = request.data.get('id_solic')
+
+    obj_pai = get_object_or_404(DadosSolicUgai, id_public=id_solic)
+    serializer = SerializerMembrosUgai(data=formsets, many=True)
+
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=400)
+
+    try:
+        membros = serializer.save(solicitacao_ref=obj_pai)
+        return Response({"message": "Membros adicionados a solicitação!"}, status=200)
+    except Exception as e:
+        return Response({"message": f"Ocorreu um erro! {e}"}, status=400)
+
+#----------------------------------------------------------------------------------------#
+#----------------------------------------------------------------------------------------#
