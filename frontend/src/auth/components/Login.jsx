@@ -7,14 +7,15 @@ import API_URL from "../../constants/global.js";
 // import "../styles/form_login.css";
 import EcoPermissIcone from "../imgs/eoc_pers_icone_sfundo.png";
 import { ContainerLogin, HeadLogin, FormStyled } from "../../styles/form_login.js";
+import Loader from "../../components/Loader.jsx";
 
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [registerUsername, setRegisterUsername] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // const [showPasswordChanged, setPasswordMessage] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -67,6 +68,7 @@ function Login() {
       return;
     }
 
+    setLoading(true);
     try {
       const response = await fetch(`${API_URL}/api/login/`, {
         method: "POST",
@@ -83,7 +85,6 @@ function Login() {
         if (data.detail) {
           messageToShow = traduzirErro[data.detail] || data.detail;
         }
-        // setError(messageToShow);
         toast.error(messageToShow)
         return;
       }
@@ -95,6 +96,8 @@ function Login() {
 
     } catch (err) {
       toast.warning("Erro ao conectar com o servidor!");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -113,13 +116,13 @@ function Login() {
         theme="colored"
         transition={Bounce}
       />
+        {loading && <Loader />}
         <div className="d-flex justify-content-center">
            <ContainerLogin>
             <HeadLogin>
               <img src={EcoPermissIcone} style={{ "width": "135px" }} />
             </HeadLogin>
             <FormStyled onSubmit={handleLogin}>
-              {/* <label htmlFor="usuario">Usuario</label> */}
               <input
                 placeholder="Usuario"
                 id="usuario"
@@ -130,7 +133,6 @@ function Login() {
                 onChange={(e) => setUsername(e.target.value)}
               />
 
-              {/* <label htmlFor="password" className="mt-2">Senha</label> */}
               <input
                 placeholder="Senha"
                 id="password"
@@ -165,11 +167,22 @@ function Login() {
                 </a>
               </span>
 
-              {/* <input type="hidden" name="next" value="{{ next }}" /> */}
-
-              {/* <input value="Entrar" type="submit" className="login-button" /> */}
-
-              <button className="login-button" type="submit">Confirmar</button>
+              <button
+                className="login-button"
+                type="submit"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <span
+                      className="spinner-border spinner-border-sm me-2"
+                      aria-hidden="true"
+                    />
+                  </>
+                ) : (
+                  "Confirmar"
+                )}
+              </button>
             </FormStyled>
 
             {registerUsername && (

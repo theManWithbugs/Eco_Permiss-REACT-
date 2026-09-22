@@ -90,7 +90,6 @@ function SolicPesquisa() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
 
     if (!token) {
       navigate('/login');
@@ -99,13 +98,11 @@ function SolicPesquisa() {
 
     if (checkAceite === false) {
       toast.warning("Faz se necessario o aceite dos termos!");
-      setLoading(false);
       return;
     }
 
     if (checkAceiteTermos === false) {
       toast.warning("Faz se necessario o aceite dos termos!");
-      setLoading(false);
       return;
     }
 
@@ -125,6 +122,7 @@ function SolicPesquisa() {
       });
     });
 
+    setLoading(true);
     try {
       const response = await fetch(`${API_URL}/api/solic_pesquisa/`, {
         method: 'POST',
@@ -142,7 +140,6 @@ function SolicPesquisa() {
 
       if (!response.ok) {
         setErrors(data);
-        setLoading(false);
         showToast(response.status, data.message)
         return;
       }
@@ -164,11 +161,11 @@ function SolicPesquisa() {
         licenca: [],
         outros: []
       });
-      setLoading(false);
 
     } catch (error) {
       console.error("❌ ERRO:", error);
       alert("Erro ao conectar com o servidor");
+    } finally {
       setLoading(false);
     }
   };

@@ -62,18 +62,19 @@ function SolicUgai() {
         setLoading(false);
         return;
       }
+      navigate('/membros_ugai', { state: id_public });
 
-      Swal.fire({
-        title: "Solicitação realizada!",
-        text: "Sua solicitação foi realizada com sucesso! Você pode acompanhá-la em 'Solicitações de UGAI'.",
-        position: "top",
-        icon: "success",
-        draggable: true
-      }).then((result) => {
-        if (result.isConfirmed) {
-          navigate('/membros_ugai', { state: id_public });
-        }
-      });
+      // Swal.fire({
+      //   title: "Solicitação realizada!",
+      //   text: "Sua solicitação foi realizada com sucesso! Você pode acompanhá-la em 'Solicitações de UGAI'.",
+      //   position: "top",
+      //   icon: "success",
+      //   draggable: true
+      // }).then((result) => {
+      //   if (result.isConfirmed) {
+      //     navigate('/membros_ugai', { state: id_public });
+      //   }
+      // });
       setErrors({});
 
     } catch (erro) {

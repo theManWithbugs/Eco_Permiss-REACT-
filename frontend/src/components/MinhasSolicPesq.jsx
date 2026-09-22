@@ -5,6 +5,7 @@ import NavUser from "./NavUser";
 import API_URL from "../constants/global.js";
 import { ToastContainer } from 'react-toastify';
 import "../styles/btn_paginator.css";
+import Loader from './Loader.jsx';
 
 function MinhasSolicPesq() {
   const navigate = useNavigate();
@@ -13,6 +14,8 @@ function MinhasSolicPesq() {
   const [totalPages, setTotalPages] = useState();
   const token = localStorage.getItem("access");
 
+  const [loading, setLoading] = useState(false);
+
   function infoPesquisa(item) {
     navigate('/info_pesquisa', { state: item });
   }
@@ -20,6 +23,7 @@ function MinhasSolicPesq() {
   function carregarPagina(numeroDaPagina) {
     if (numeroDaPagina < 1) return;
 
+    setLoading(true);
     fetch(`${API_URL}/api/solic_pesq_user/?page=${numeroDaPagina}`, {
       method: 'GET',
       headers: {
@@ -53,6 +57,9 @@ function MinhasSolicPesq() {
           </div>
         `;
       })
+      .finally(() => {
+        setLoading(false);
+      })
   }
 
   useEffect(() => {
@@ -67,6 +74,7 @@ function MinhasSolicPesq() {
   return (
     <>
       <ToastContainer />
+      {loading && <Loader />}
       <div className='container bg-white p-2 rounded'>
         <h5 className='pesquisas_title'>Pesquisas | (Solicitadas/Finalizadas)</h5>
         <div id="container_error" className="error-container"></div>

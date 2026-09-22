@@ -11,8 +11,8 @@ import img_acuraua_02 from "../img/img_acuraua_02.jpg"
 import img_chandles_01 from "../img/img_chandles_01.jpg"
 import img_chandles_02 from "../img/img_chandles_02.jpg"
 
-import img_ugai_afluente_01 from "../img/ugai_afluente_01.jpeg"
-import img_ugai_afluente_02 from "../img/ugai_afluente_02.jpeg"
+import img_ugai_afluente_01 from "../img/ugai_afluente_01.png"
+import img_ugai_afluente_02 from "../img/ugai_afluente_02.png"
 
 function MapaAcre() {
     return (

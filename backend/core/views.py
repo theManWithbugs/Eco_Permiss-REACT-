@@ -56,7 +56,7 @@ def max_file_size(file):
         raise ValidationError(f"O arquivo {file.name} ultrapassa o tamanho maximo permitido!")
     return;
 
-# Essa função aqui retira caracteres especias do nome dos arquivos antes de salvar
+# Essa função aqui retira caracteres especiais do nome dos arquivos antes de salvar
 def _sanitizar_nome_arquivo(filename):
     if not filename:
         return filename
@@ -1079,7 +1079,7 @@ def membro_ugai(request):
 
     try:
         membros = serializer.save(solicitacao_ref=obj_pai)
-        return Response({"message": "Membros adicionados a solicitação!"}, status=200)
+        return Response(obj_pai.id_public, status=200)
     except Exception as e:
         return Response({"message": f"Ocorreu um erro! {e}"}, status=400)
 

@@ -1,10 +1,9 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { ToastContainer } from 'react-toastify';
-import API_URL from "../constants/global.js";
-import styled from 'styled-components';
+import { toast, ToastContainer } from 'react-toastify';
 import { dataInfoUgai } from '../constants/global.js';
+import Skeleton from "../components/VideoSkeleton.jsx";
 
 import {
   CardUgai,
@@ -84,25 +83,36 @@ function InfoUgai() {
   const id_public = location.state;
   const [obj, setObj] = useState();
   const [membros, setMembros] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!id_public) navigate('/minhas_solic');
+    if (!id_public) {
+      navigate('/minhas_solic');
+      return;
+    }
+
     const carregarDados = async () => {
-      const dados = await dataInfoUgai(token, id_public);
-      setObj(dados.solicitacao);
-      setMembros(dados.membros);
+      setLoading(true);
+      try {
+        const dados = await dataInfoUgai(token, id_public);
+        setObj(dados.solicitacao);
+        setMembros(dados.membros);
+      } finally {
+        setLoading(false);
+      }
     }
     carregarDados();
   }, [id_public, navigate]);
-
-  if (!obj) return null;
 
   return (
     <>
       <CardUgai>
         <ToastContainer />
 
-        <IuCard>
+        {loading ? (
+          <Skeleton />
+          ) : (
+          <IuCard>
 
           <IuHeader>
 
@@ -235,7 +245,8 @@ function InfoUgai() {
             </ContentWrapper>
           </PageContainer>
 
-        </IuCard>
+          </IuCard>
+        )}
 
       </CardUgai>
 

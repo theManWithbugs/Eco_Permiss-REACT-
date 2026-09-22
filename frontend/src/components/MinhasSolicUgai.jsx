@@ -2,7 +2,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API_URL from "../constants/global.js";
-import InfoUgai from './InfoUgai.jsx';
+import Loader from './Loader.jsx';
 
 function MinhasSolicUgai() {
   const navigate = useNavigate();
@@ -10,6 +10,8 @@ function MinhasSolicUgai() {
   const [paginaAtual, setPaginaAtual] = useState();
   const [totalPages, setTotalPages] = useState();
   const token = localStorage.getItem("access");
+
+  const [loading, setLoading] = useState(false);
 
   function infoUgai(item) {
     console.log(item);
@@ -19,6 +21,7 @@ function MinhasSolicUgai() {
   function carregarPagina(numeroDaPagina) {
     if (numeroDaPagina < 1) return;
 
+    setLoading(true);
     fetch(`${API_URL}/api/minhas_solic_ugai/?page=${numeroDaPagina}`, {
       method: 'GET',
       headers: {
@@ -52,6 +55,9 @@ function MinhasSolicUgai() {
           </div>
         `;
       })
+      .finally(() => {
+        setLoading(false);
+      })
   }
 
   useEffect(() => {
@@ -64,48 +70,51 @@ function MinhasSolicUgai() {
   }, []);
 
   return (
-    <div className='container bg-white p-2 rounded'>
-      <h5 className='pesquisas_title'>UGAI | (Solicitadas/Finalizadas)</h5>
-      <div id='container_error' className='error-container'></div>
-        <br />
-        {dados.map((item) => (
-          <div className='card_items' key={ item.id }>
-            <h5 className='text-uppercase'>
-              {item.ativ_desenv?.length > 60
-                ? item.ativ_desenv.slice(0, 60) + '...'
-                : item.ativ_desenv}
-            </h5>
-            <div>
-              <span>Status: <span style={{ color: item.status === 'APROVADO' ? '#16a34a' : item.status === 'PENDENTE' ? '#78909c' : item.status === 'INDEFERIDO' ? '#dc2626' : '#1565c0', fontWeight: 600 }}>{ item.status }</span></span>
+    <>
+      {loading && <Loader />}
+      <div className='container bg-white p-2 rounded'>
+        <h5 className='pesquisas_title'>UGAI | (Solicitadas/Finalizadas)</h5>
+        <div id='container_error' className='error-container'></div>
+          <br />
+          {dados.map((item) => (
+            <div className='card_items' key={ item.id }>
+              <h5 className='text-uppercase'>
+                {item.ativ_desenv?.length > 60
+                  ? item.ativ_desenv.slice(0, 60) + '...'
+                  : item.ativ_desenv}
+              </h5>
+              <div>
+                <span>Status: <span style={{ color: item.status === 'APROVADO' ? '#16a34a' : item.status === 'PENDENTE' ? '#78909c' : item.status === 'INDEFERIDO' ? '#dc2626' : '#1565c0', fontWeight: 600 }}>{ item.status }</span></span>
+              </div>
+              <a style={{ cursor: 'pointer', color: 'white' }} onClick={() => infoUgai(item.id_public)}>
+                Ver detalhes</a>
             </div>
-            <a style={{ cursor: 'pointer', color: 'white' }} onClick={() => infoUgai(item.id_public)}>
-              Ver detalhes</a>
-          </div>
-        ))}
+          ))}
 
-      <div className="button-container">
-        <button className="button-3d" id="btn-anterior"
-        title="Página anterior" onClick={(e) => carregarPagina(paginaAtual - 1)}>
-          <div className="button-top">
-            <span className="material-icons">❮</span>
-          </div>
-          <div className="button-bottom"></div>
-          <div className="button-base"></div>
-        </button>
+        <div className="button-container">
+          <button className="button-3d" id="btn-anterior"
+          title="Página anterior" onClick={(e) => carregarPagina(paginaAtual - 1)}>
+            <div className="button-top">
+              <span className="material-icons">❮</span>
+            </div>
+            <div className="button-bottom"></div>
+            <div className="button-base"></div>
+          </button>
 
-        <span id="info-pagina" className="info-pagina mt-4">
-          Página { paginaAtual } de { totalPages }</span>
+          <span id="info-pagina" className="info-pagina mt-4">
+            Página { paginaAtual } de { totalPages }</span>
 
-        <button className="button-3d" id="btn-proximo"
-        title="Próxima página" onClick={(e) => carregarPagina(paginaAtual + 1)}>
-          <div className="button-top">
-            <span className="material-icons">❯</span>
-          </div>
-          <div className="button-bottom"></div>
-          <div className="button-base"></div>
-        </button>
+          <button className="button-3d" id="btn-proximo"
+          title="Próxima página" onClick={(e) => carregarPagina(paginaAtual + 1)}>
+            <div className="button-top">
+              <span className="material-icons">❯</span>
+            </div>
+            <div className="button-bottom"></div>
+            <div className="button-base"></div>
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

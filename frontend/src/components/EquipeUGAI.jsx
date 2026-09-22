@@ -1,9 +1,28 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import buscarChoicesDoBanco from '../constants/choices';
 import API_URL from '../constants/global';
+import styled from "styled-components";
+import {
+  Pagina,
+  Cabecalho,
+  Titulo,
+  BotaoAdicionar,
+  Formulario,
+  CartaoMembro,
+  CabecalhoMembro,
+  NumeroMembro,
+  Grade,
+  Campo,
+  Label,
+  Input,
+  Select,
+  BotaoRemover,
+  RodapeForm,
+  BotaoEnviar
+} from '../styles/equipe_ugai';
+import NavUser from './NavUser';
 
 const FORM_INICIAL = () => ({
   id: Date.now() + Math.random(),
@@ -20,9 +39,6 @@ function MembroEquipeUGAI() {
   const id = state;
   const token = localStorage.getItem("access");
   const navigate = useNavigate();
-  // const [nome, setNome] = useState("");
-  // const [email, setEmail] = useState("");
-  // const [telefone, setTelefone] = useState("");
 
   const [choicesRaca, setChoicesRaca] = useState([]);
   const [choicesGenero, setChoicesGenero] = useState([]);
@@ -105,6 +121,7 @@ function MembroEquipeUGAI() {
       });
 
       const data = await response.json();
+      navigate('/info_ugai', { state: data });
 
     } catch (error) {
       alert(`Ocorreu um erro! ${error}`);
@@ -141,89 +158,109 @@ function MembroEquipeUGAI() {
 
   return (
     <>
-      <div className='container'>s
-        <button onClick={criarFormset}>Adicionar membro</button>
-      </div>
+      <NavUser/>
+      <Pagina>
+        <Cabecalho>
+          <Titulo>
+            <h1>Equipe da pesquisa</h1>
+            <p>Cadastre os membros que participarão da atividade na UGAI</p>
+          </Titulo>
+          <BotaoAdicionar type="button" onClick={criarFormset}>+ Adicionar membro</BotaoAdicionar>
+        </Cabecalho>
 
-      <form onSubmit={handleSubmit} className='container'>
-        {formsets.map((form, index) => (
-          <div key={form.id}>
-            <label className='form-label' htmlFor='nome'>Nome Completo</label>
-            <input
-              id='nome'
-              className='form-control'
-              type="text"
-              value={form.nome}
-              maxLength={80}
-              onChange={e => handleInputChange(form.id, 'nome', e.target.value)}
-            />
+        <Formulario onSubmit={handleSubmit}>
+          {formsets.map((form, index) => (
+            <CartaoMembro key={form.id}>
+              <CabecalhoMembro>
+                <NumeroMembro>Membro {index + 1}</NumeroMembro>
+                {formsets.length > 1 && (
+                  <BotaoRemover type='button' onClick={() => excluirFormset(form.id)}>
+                    ✕ Remover
+                  </BotaoRemover>
+                )}
+              </CabecalhoMembro>
 
-            <label className='form-label' htmlFor='email'>Email</label>
-            <input
-              id='email'
-              className='form-control'
-              type="text"
-              value={form.email}
-              maxLength={150}
-              onChange={e => handleInputChange(form.id, 'email', e.target.value)}
-            />
+              <Grade>
+                <Campo $largo>
+                  <Label htmlFor='nome'>Nome Completo</Label>
+                  <Input
+                    id='nome'
+                    type="text"
+                    value={form.nome}
+                    maxLength={80}
+                    onChange={e => handleInputChange(form.id, 'nome', e.target.value)}
+                  />
+                </Campo>
 
-            <label htmlFor="telefone" className='form-label'>Contato</label>
-            <input
-              id='telefone'
-              className='form-control'
-              type="text"
-              value={form.telefone}
-              maxLength={11}
-              onChange={e => handleInputChange(form.id, 'telefone', e.target.value)}
-            />
+                <Campo>
+                  <Label htmlFor='email'>Email</Label>
+                  <Input
+                    id='email'
+                    type="text"
+                    value={form.email}
+                    maxLength={150}
+                    onChange={e => handleInputChange(form.id, 'email', e.target.value)}
+                  />
+                </Campo>
 
-            <select
-              className='form-select mt-4'
-              value={form.genero}
-              onChange={(e) => handleInputChange(form.id, 'genero', e.target.value)}
-            >
-              <option value="">Selecione seu genero</option>
-                {choicesGenero.map((genero) => (
-                  <option value={genero.value} key={genero.value}>{ genero.label }</option>
-                ))}
-            </select>
+                <Campo>
+                  <Label htmlFor="telefone">Contato</Label>
+                  <Input
+                    id='telefone'
+                    type="text"
+                    value={form.telefone}
+                    maxLength={11}
+                    onChange={e => handleInputChange(form.id, 'telefone', e.target.value)}
+                  />
+                </Campo>
 
-            <label htmlFor="data_nasc" className='mt-3'>Data de nascimento:</label><br />
-            <input
-              className='rounded'
-              id='data_nasc'
-              type="date"
-              value={form.data_nasc}
-              maxLength={11}
-              onChange={e => handleInputChange(form.id, 'data_nasc', e.target.value)}
-            />
+                <Campo>
+                  <Label htmlFor="genero">Gênero</Label>
+                  <Select
+                    id="genero"
+                    value={form.genero}
+                    onChange={(e) => handleInputChange(form.id, 'genero', e.target.value)}
+                  >
+                    <option value="">Selecione seu genero</option>
+                      {choicesGenero.map((genero) => (
+                        <option value={genero.value} key={genero.value}>{ genero.label }</option>
+                      ))}
+                  </Select>
+                </Campo>
 
-            <select
-              className='form-select mt-4'
-              value={form.cor_raca}
-              onChange={(e) => handleInputChange(form.id, 'cor_raca', e.target.value)}
-            >
-              <option value="">Selecionar raça</option>
-                {choicesRaca.map((raca) => (
-                  <option value={raca.value} key={raca.value}>{ raca.label }</option>
-                ))}
-            </select>
+                <Campo>
+                  <Label htmlFor="data_nasc">Data de nascimento</Label>
+                  <Input
+                    id='data_nasc'
+                    type="date"
+                    value={form.data_nasc}
+                    maxLength={11}
+                    onChange={e => handleInputChange(form.id, 'data_nasc', e.target.value)}
+                  />
+                </Campo>
 
-            {formsets.length > 1 && (
-              <div style={{ marginTop: '1rem' }}>
-                <button
-                  type='button'
-                  onClick={() => excluirFormset(form.id)}
-                >
-                  ✕ Remover Membro
-                </button>
-              </div>
-            )}
-          </div>
-        ))}
-        <button type='submit' className='mt-4 btn btn-info'>Enviar</button>
-      </form>
+                <Campo>
+                  <Label htmlFor="cor_raca">Raça/Cor</Label>
+                  <Select
+                    id="cor_raca"
+                    value={form.cor_raca}
+                    onChange={(e) => handleInputChange(form.id, 'cor_raca', e.target.value)}
+                  >
+                    <option value="">Selecionar raça</option>
+                      {choicesRaca.map((raca) => (
+                        <option value={raca.value} key={raca.value}>{ raca.label }</option>
+                      ))}
+                  </Select>
+                </Campo>
+              </Grade>
+            </CartaoMembro>
+          ))}
+
+          <RodapeForm>
+            <BotaoEnviar type='submit'>Enviar</BotaoEnviar>
+          </RodapeForm>
+        </Formulario>
+      </Pagina>
     </>
   );
 }

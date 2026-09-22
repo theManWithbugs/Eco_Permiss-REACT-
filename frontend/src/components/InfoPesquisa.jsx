@@ -11,13 +11,12 @@ import {
   IconClipboard,
   IconFlower,
   IconFile,
-  IconPerson,
   IconEye,
-  IconCalendar,
-  IconPlus
+  IconCalendar
 } from '../components/IconesProntos';
 import AlterarDocSolic from './AlterarDocSolic.jsx';
 import * as S from "../styles/info_pesquisa.js";
+import Skeleton from "../components/VideoSkeleton.jsx";
 
 /* ─── Badge de status ─────────────────────────────────────── */
 const StatusBadge = ({ status }) => {
@@ -67,8 +66,8 @@ function InfoPesquisa() {
   const location = useLocation();
   const token = localStorage.getItem("access");
   const id = location.state?.id;
-
   const [membros, setMembros] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [obj, setObj] = useState({});
 
   const payload = { id };
@@ -76,6 +75,7 @@ function InfoPesquisa() {
   const buscarMembros = async () => {
     const token = localStorage.getItem("access");
     if (!token) { navigate('/login'); return; }
+    setLoading(true);
     try {
       const res  = await fetch(`${API_URL}/api/membros_equip/`, {
         method: "POST",
@@ -90,35 +90,22 @@ function InfoPesquisa() {
       setMembros(await res.json());
     } catch (e) {
       toast.warning(`Erro na requisição: ${e}`);
+    } finally {
+      setLoading(false);
     }
   };
-
-  // const infoPesquisa = async () => {
-  //   const token = localStorage.getItem("access");
-  //   if (!token) { navigate('/login'); return; }
-  //   try {
-  //     const res  = await fetch(`${API_URL}/api/info_pesq/`, {
-  //       method: "POST",
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //         "Content-Type": "application/json"
-  //       },
-  //       body: JSON.stringify(payload),
-  //     });
-  //     if (!res.ok) { toast.error("Erro ao buscar dados"); return; }
-  //     setObj(await res.json());
-  //   } catch (e) {
-  //     toast.warning(`Erro na requisição: ${e}`);
-  //   }
-  // };
 
   useEffect(() => {
     if (!id) { navigate('/minhas_solic'); return; }
     buscarMembros();
-    // infoPesquisa();
     const carregarDados = async () => {
-      const dados = await dataInfoPesq(token, payload);
-      setObj(dados);
+      setLoading(true);
+      try {
+        const dados = await dataInfoPesq(token, payload);
+        setObj(dados);
+      } finally {
+        setLoading(false);
+      }
     }
     carregarDados();
   }, [id, navigate]);
@@ -126,122 +113,128 @@ function InfoPesquisa() {
   return (
       <>
         {/* ── Body ── */}
-        <S.Body>
-          {/* Seção 1 — Identificação */}
-          <S.Section>
-            <S.SectionLabel>
-              <IconFolder /> Identificação da Pesquisa
-            </S.SectionLabel>
-            <S.Cards>
-              <S.Card
-                borderColor="#4caf50"
-                background="#f0f9f1"
-              >
-                <S.CardLabel>Ação(s) Realizada(s)</S.CardLabel>
-                <S.CardValue>{obj.acao_realizada}</S.CardValue>
-              </S.Card>
-            </S.Cards>
-          </S.Section>
-
-          {/* Seção 2 — Documentação */}
-          <S.Section>
-            <S.SectionLabel>
-              <IconClipboard /> Documentação e Autorização
-            </S.SectionLabel>
-            <S.Cards>
-              <S.Card
-                borderColor="#e49b3c"
-                background="#f0f9f1"
-              >
-                <S.CardLabel>Fotografias da UC</S.CardLabel>
-                <S.CardValue>{obj.foto}</S.CardValue>
-              </S.Card>
-            </S.Cards>
-          </S.Section>
-
-          {/* Seção 3 — Escopo */}
-          <S.Section>
-            <S.SectionLabel>
-              <IconFlower /> Escopo e Impacto
-            </S.SectionLabel>
-            <S.Cards>
-              <S.Card
-                borderColor="#3c8de4"
-                background="#f0f9f1"
-              >
-                <S.CardLabel>Retorno para a Comunidade</S.CardLabel>
-                <S.CardValue>{obj.retorno_comuni}</S.CardValue>
-              </S.Card>
-            </S.Cards>
-          </S.Section>
-
-          <hr className="ip-divider" />
-
-          {/* Seção 4 — Documentos do solicitante */}
-          <S.Section>
-            <S.SectionLabel>
-              <IconFile /> Documentos do Solicitante
-            </S.SectionLabel>
-            <S.DocsGrid>
-              {obj.doc_ident    && <DocCard href={obj.doc_ident}    label={formatarNomeArquivo(obj.doc_ident)} />}
-              {obj.doc_cpf      && <DocCard href={obj.doc_cpf}      label={formatarNomeArquivo(obj.doc_cpf)} />}
-              {obj.doc_seg_vida && <DocCard href={obj.doc_seg_vida} label={formatarNomeArquivo(obj.doc_seg_vida)} />}
-            </S.DocsGrid>
-          </S.Section>
-
-          {/* Outros documentos */}
-          {obj?.outros_documentos?.length > 0 && (
+        {loading ? (
+          <Skeleton />
+          ) : (
+          <S.Body>
+            {/* Seção 1 — Identificação */}
             <S.Section>
               <S.SectionLabel>
-                <IconFile /> Outros Documentos
+                <IconFolder /> Identificação da Pesquisa
               </S.SectionLabel>
-              <S.DocsGrid>
-                {obj.outros_documentos.map((doc) => (
-                  <DocCard key={doc.id} href={doc.doc_url} label={formatarNomeArquivo(doc.doc_url)} />
-                ))}
-              </S.DocsGrid>
+              <S.Cards>
+                <S.Card
+                  borderColor="#4caf50"
+                  background="#f0f9f1"
+                >
+                  <S.CardLabel>Ação(s) Realizada(s)</S.CardLabel>
+                  <S.CardValue>{obj.acao_realizada}</S.CardValue>
+                </S.Card>
+              </S.Cards>
             </S.Section>
-          )}
 
-          {/* Licenças de instituição */}
-          {obj?.licencas?.length > 0 && (
+            {/* Seção 2 — Documentação */}
             <S.Section>
               <S.SectionLabel>
-                <IconFile /> Licenças de Instituição
+                <IconClipboard /> Documentação e Autorização
               </S.SectionLabel>
-              <S.DocsGrid>
-                {obj.licencas.map((doc) => (
-                  <DocCard key={doc.id} href={doc.doc_url} label={formatarNomeArquivo(doc.doc_url)} />
-                ))}
-              </S.DocsGrid>
+              <S.Cards>
+                <S.Card
+                  borderColor="#e49b3c"
+                  background="#f0f9f1"
+                >
+                  <S.CardLabel>Fotografias da UC</S.CardLabel>
+                  <S.CardValue>{obj.foto}</S.CardValue>
+                </S.Card>
+              </S.Cards>
             </S.Section>
-          )}
 
-          {/* DocPesquisa (só quando aprovado) */}
-          {obj.status === "APROVADO" && (
-            <DocPesquisa id_pesquisa={id} status_obj={obj.status} />
-          )}
+            {/* Seção 3 — Escopo */}
+            <S.Section>
+              <S.SectionLabel>
+                <IconFlower /> Escopo e Impacto
+              </S.SectionLabel>
+              <S.Cards>
+                <S.Card
+                  borderColor="#3c8de4"
+                  background="#f0f9f1"
+                >
+                  <S.CardLabel>Retorno para a Comunidade</S.CardLabel>
+                  <S.CardValue>{obj.retorno_comuni}</S.CardValue>
+                </S.Card>
+              </S.Cards>
+            </S.Section>
 
-          <AlterarDocSolic id_pesq={id} />
+            <hr className="ip-divider" />
 
-          <hr className="ip-divider" />
+            {/* Seção 4 — Documentos do solicitante */}
+              <S.Section>
+                <S.SectionLabel>
+                  <IconFile /> Documentos do Solicitante
+                </S.SectionLabel>
+                <S.DocsGrid>
+                  {obj.doc_ident    && <DocCard href={obj.doc_ident}    label={formatarNomeArquivo(obj.doc_ident)} />}
+                  {obj.doc_cpf      && <DocCard href={obj.doc_cpf}      label={formatarNomeArquivo(obj.doc_cpf)} />}
+                  {obj.doc_seg_vida && <DocCard href={obj.doc_seg_vida} label={formatarNomeArquivo(obj.doc_seg_vida)} />}
+                </S.DocsGrid>
+              </S.Section>
 
-          {/* Seção 5 — Status */}
-          <S.StatusBar>
-            <S.StatusMeta>
-              <strong>Status da Solicitação</strong>
-              <span>Situação atual do processo</span>
-            </S.StatusMeta>
+              {/* Outros documentos */}
+              {obj?.outros_documentos?.length > 0 && (
+                <S.Section>
+                  <S.SectionLabel>
+                    <IconFile /> Outros Documentos
+                  </S.SectionLabel>
+                  <S.DocsGrid>
+                    {obj.outros_documentos.map((doc) => (
+                      <DocCard key={doc.id} href={doc.doc_url} label={formatarNomeArquivo(doc.doc_url)} />
+                    ))}
+                  </S.DocsGrid>
+                </S.Section>
+              )}
 
-            <StatusBadge status={obj.status} />
-          </S.StatusBar>
+              {/* Licenças de instituição */}
+              {obj?.licencas?.length > 0 && (
+                <S.Section>
+                  <S.SectionLabel>
+                    <IconFile /> Licenças de Instituição
+                  </S.SectionLabel>
+                  <S.DocsGrid>
+                    {obj.licencas.map((doc) => (
+                      <DocCard key={doc.id} href={doc.doc_url} label={formatarNomeArquivo(doc.doc_url)} />
+                    ))}
+                  </S.DocsGrid>
+                </S.Section>
+              )}
 
-          {/* Footer */}
-          <S.FooterNote>
-            <IconCalendar />
-            Solicitação registrada em {obj.data_solicitacao}
-          </S.FooterNote>
-          </S.Body>
+            {/* DocPesquisa (só quando aprovado) */}
+            {obj.status === "APROVADO" && (
+              <DocPesquisa id_pesquisa={id} status_obj={obj.status} />
+            )}
+
+            {obj.status === "APROVADO" &&
+              <AlterarDocSolic id_pesq={id} />
+            }
+
+            <hr className="ip-divider" />
+
+            {/* Seção 5 — Status */}
+            <S.StatusBar>
+              <S.StatusMeta>
+                <strong>Status da Solicitação</strong>
+                <span>Situação atual do processo</span>
+              </S.StatusMeta>
+
+              <StatusBadge status={obj.status} />
+            </S.StatusBar>
+
+            {/* Footer */}
+            <S.FooterNote>
+              <IconCalendar />
+              Solicitação registrada em {obj.data_solicitacao}
+            </S.FooterNote>
+            </S.Body>
+        )}
       </>
   );
 }

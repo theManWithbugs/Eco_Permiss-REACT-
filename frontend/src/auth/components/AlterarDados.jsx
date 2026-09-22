@@ -1,8 +1,10 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { redirect, useNavigate } from 'react-router-dom';
 import API_URL from '../../constants/global';
 import NavUser from '../../components/NavUser';
+import Loader from '../../components/Loader';
+import { toast, ToastContainer } from 'react-toastify';
 
 function AlterarDadosUser() {
   const navigate = useNavigate();
@@ -27,7 +29,7 @@ function AlterarDadosUser() {
     telefone_fixo: '',
   });
   const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState('');
+  // const [message, setMessage] = useState('');
 
   useEffect(() => {
     if (!token) {
@@ -37,6 +39,7 @@ function AlterarDadosUser() {
 
     // Aqui carrega os dados já cadastrados
     const carregarDados = async () => {
+      setLoading(true);
       try {
         const res = await fetch(`${API_URL}/api/dados_user/`, {
           headers: {
@@ -66,7 +69,7 @@ function AlterarDadosUser() {
           telefone_fixo: data.dados_pessoais?.telefone_fixo || '',
         });
       } catch (err) {
-        setMessage(err.message || 'Erro ao carregar dados.');
+        toast.error("Erro ao carregar dados");
       } finally {
         setLoading(false);
       }
@@ -88,6 +91,7 @@ function AlterarDadosUser() {
       return;
     }
 
+    setLoading(true);
     try {
       const res = await fetch(`${API_URL}/api/alt_dados_user/`, {
         method: 'POST',
@@ -104,26 +108,26 @@ function AlterarDadosUser() {
         throw new Error(Object.values(data)[0]?.[0] || 'Não foi possível alterar os dados.');
       }
 
-      setMessage('Dados alterados com sucesso!');
+      // toast.success("Dados alterados com sucesso!");
+      navigate("/perfil", {
+        state: {
+          message: 'Dados alterados com sucesso!'
+        }
+      });
     } catch (err) {
-      setMessage(err.message || 'Erro ao conectar com o servidor.');
+      toast.success("Erro ao conectar com o servidor");
+    } finally {
+      setLoading(false);
     }
   };
-
-  if (loading) {
-    return <p className="text-center mt-4">Carregando...</p>;
-  }
 
   return (
     <>
     <NavUser />
+      <ToastContainer />
+      {loading && <Loader />}
       <div className="container py-4">
         <div className='card shadow-sm'>
-          <div className='card-header'>
-            <h4 className="mb-4">Alterar dados</h4>
-            {message && <div className="alert alert-info">{message}</div>}
-          </div>
-
           <div className='card-body'>
             <form onSubmit={handleSubmit} className="row g-3">
               <div className="col-md-6">
@@ -192,7 +196,23 @@ function AlterarDadosUser() {
               </div>
 
               <div className="col-12">
-                <button type="submit" className="btn btn-primary">Salvar alterações</button>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <span
+                        className="spinner-border spinner-border-sm me-2"
+                        aria-hidden="true"
+                      />
+                      Carregando...
+                    </>
+                  ) : (
+                    "Salvar"
+                  )}
+                </button>
               </div>
             </form>
           </div>

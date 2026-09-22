@@ -1,4 +1,4 @@
-export const buscarChoicesDoBanco = () => {
+export const buscarChoicesDoBanco = async () => {
   const token = localStorage.getItem("access");
 
   if (!token) {
